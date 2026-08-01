@@ -14,9 +14,11 @@ function App() {
   useEffect(() => {
     const loadSystemStatus = async () => {
       try {
-        const apiUri = import.meta.env.VITE_API_URI ?? "";
+        const apiUrl = import.meta.env.VITE_API_URL ?? "";
 
-        const response = await fetch(`${apiUri}/api/system/status`);
+        console.log("API URL :", apiUrl);
+
+        const response = await fetch(`${apiUrl}/api/system/status`);
 
         if (!response.ok) {
           throw new Error(`Erreur HTTP ${response.status}`);
@@ -26,9 +28,11 @@ function App() {
         setSystemStatus(data);
       } catch (requestError) {
         const message =
-          requestError instanceof Error
-            ? requestError.message
-            : "Une erreur inconnue est survenue";
+            requestError instanceof Error
+                ? requestError.message
+                : "Une erreur inconnue est survenue";
+
+        setError(message);
       }
     };
 
