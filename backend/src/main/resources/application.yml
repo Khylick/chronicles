@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: chronicles
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/chronicles}
+    username: ${SPRING_DATASOURCE_USERNAME:chronicles}
+    password: ${SPRING_DATASOURCE_PASSWORD:chronicles}
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+server:
+  port: 8080
