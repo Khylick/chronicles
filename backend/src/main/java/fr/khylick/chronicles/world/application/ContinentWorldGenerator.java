@@ -16,7 +16,9 @@ public class ContinentWorldGenerator implements WorldGenerator {
     // 3 : Pour davantage de détails
     // 4 : Réglage de base
     // 5 : Pour des masses plus lisses
-    private static final int SMOOTHING_PASSES = 3;
+    private static final int SMOOTHING_PASSES = 5;
+
+    private static final int ELEVATION_SMOOTHING_PASSES = 2;
 
     private final RandomGenerator randomGenerator;
 
@@ -41,8 +43,28 @@ public class ContinentWorldGenerator implements WorldGenerator {
             landMap = smoothLandMap(landMap, width, height);
         }
 
+        double[][] elevationMap = generateElevationMap(
+            landMap,
+            width,
+            height
+        );
+
+        for (
+            int pass = 0;
+            pass < ELEVATION_SMOOTHING_PASSES;
+            pass++
+        ) {
+            elevationMap = smoothElevationMap(
+                elevationMap,
+                landMap,
+                width,
+                height
+            );
+        }
+
         List<Tile> tiles = generateTiles(
             landMap,
+            elevationMap,
             width,
             height
         );
@@ -129,6 +151,7 @@ public class ContinentWorldGenerator implements WorldGenerator {
 
     private List<Tile> generateTiles(
         boolean[][] landMap,
+        double[][] elevationMap,
         int width,
         int height
     ) {
@@ -140,6 +163,7 @@ public class ContinentWorldGenerator implements WorldGenerator {
                 TerrainType terrainType =
                     determineTerrainType(
                         landMap,
+                        elevationMap,
                         x,
                         y,
                         width,
@@ -158,42 +182,41 @@ public class ContinentWorldGenerator implements WorldGenerator {
         return tiles;
     }
 
-    private TerrainType determineTerrainType(
-        boolean[][] landMap,
-        int x,
-        int y,
-        int width,
-        int height
+    private static TerrainType determineTerrainType(
+            boolean[][] landMap,
+            double[][] elevationMap,
+            int x,
+            int y,
+            int width,
+            int height
     ) {
         if (!landMap[y][x]) {
             return TerrainType.OCEAN;
         }
 
         if (hasAdjacentOcean(
-            landMap,
-            x,
-            y,
-            width,
-            height
+                landMap,
+                x,
+                y,
+                width,
+                height
         )) {
             return TerrainType.BEACH;
         }
 
-        int value = randomGenerator.nextInt(100);
+        double elevation = elevationMap[y][x];
 
-        if (value < 45) {
-            return TerrainType.PLAIN;
+        // Régler le paramêtre pour plus ou moins de montagnes.
+        if (elevation >= 0.72) {
+            return TerrainType.MOUNTAIN;
         }
 
-        if (value < 75) {
-            return TerrainType.FOREST;
-        }
-
-        if (value < 92) {
+        // Régler le paramêtre pour plus ou moins de plaines.
+        if (elevation >= 0.59) {
             return TerrainType.HILL;
         }
 
-        return TerrainType.MOUNTAIN;
+        return TerrainType.PLAIN;
     }
 
     private static int countLandNeighbours(
@@ -307,5 +330,109 @@ public class ContinentWorldGenerator implements WorldGenerator {
                 "La hauteur du monde doit être strictement positive"
             );
         }
+    }
+
+    private double[][] generateElevationMap(
+        boolean[][] landMap,
+        int width,
+        int height
+    ) {
+        double[][] elevationMap =
+            new double[height][width];
+
+        double centerX = (width - 1) / 2.0;
+        double centerY = (height - 1) / 2.0;
+        double maximumDistance = Math.sqrt(
+            centerX * centerX + centerY * centerY
+        );
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (!landMap[y][x]) {
+                    elevationMap[y][x] = 0.0;
+                    continue;
+                }
+
+                double distanceFromCenter = Math.sqrt(
+                    Math.pow(x - centerX, 2)
+                        + Math.pow(y - centerY, 2)
+                );
+
+                double normalizedDistance =
+                    distanceFromCenter / maximumDistance;
+
+                double continentalFactor =
+                    1.0 - normalizedDistance;
+
+                double randomFactor =
+                    randomGenerator.nextDouble();
+
+                elevationMap[y][x] =
+                    continentalFactor * 0.50
+                        + randomFactor * 0.50;
+            }
+        }
+
+        return elevationMap;
+    }
+
+    private static double[][] smoothElevationMap(
+        double[][] currentMap,
+        boolean[][] landMap,
+            int width,
+            int height
+    ) {
+        double[][] smoothedMap =
+            new double[height][width];
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (!landMap[y][x]) {
+                    smoothedMap[y][x] = 0.0;
+                    continue;
+                }
+
+                double total = 0.0;
+                int count = 0;
+
+                for (
+                    int offsetY = -1;
+                    offsetY <= 1;
+                    offsetY++
+                ) {
+                    for (
+                        int offsetX = -1;
+                        offsetX <= 1;
+                        offsetX++
+                    ) {
+                        int neighbourX = x + offsetX;
+                        int neighbourY = y + offsetY;
+
+                        if (
+                            neighbourX < 0
+                                || neighbourX >= width
+                                || neighbourY < 0
+                                || neighbourY >= height
+                        ) {
+                            continue;
+                        }
+
+                        if (!landMap[neighbourY][neighbourX]) {
+                            continue;
+                        }
+
+                        total += currentMap[neighbourY][neighbourX];
+                        count++;
+                    }
+                }
+
+                smoothedMap[y][x] =
+                    count == 0
+                        ? currentMap[y][x]
+                        : total / count;
+            }
+        }
+
+        return smoothedMap;
     }
 }
