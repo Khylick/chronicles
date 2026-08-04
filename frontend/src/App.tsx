@@ -5,8 +5,8 @@ import { useWorld } from "./features/world/hooks/useWorld";
 import { TerrainLegend } from "./features/world/components/TerrainLegend";
 import { WorldMap } from "./features/world/components/WorldMap";
 
-const WORLD_WIDTH = 40;
-const WORLD_HEIGHT = 24;
+const WORLD_WIDTH = 80
+const WORLD_HEIGHT = 48;
 
 function App() {
   const {

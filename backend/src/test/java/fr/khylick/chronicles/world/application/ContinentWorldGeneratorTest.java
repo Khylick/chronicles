@@ -113,4 +113,78 @@ class ContinentWorldGeneratorTest {
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("hauteur");
     }
+
+    @Test
+    void shouldGenerateGroupedRelief() {
+        World world =
+            new ContinentWorldGenerator(new Random(42))
+                .generate(40, 24);
+
+        long mountainCount = world.getTiles()
+            .stream()
+            .filter(tile ->
+                tile.getTerrainType()
+                    == TerrainType.MOUNTAIN
+            )
+            .count();
+
+        long hillCount = world.getTiles()
+            .stream()
+            .filter(tile ->
+                tile.getTerrainType()
+                    == TerrainType.HILL
+            )
+            .count();
+
+        assertThat(mountainCount).isGreaterThan(0);
+        assertThat(hillCount).isGreaterThan(0);
+    }
+
+    @Test
+    void shouldNotGenerateMountainDirectlyNextToOcean() {
+        World world =
+            new ContinentWorldGenerator(new Random(42))
+                .generate(40, 24);
+
+        world.getTiles()
+            .stream()
+            .filter(tile ->
+                tile.getTerrainType()
+                    == TerrainType.MOUNTAIN
+            )
+            .forEach(tile -> {
+                int x = tile.getPosition().x();
+                int y = tile.getPosition().y();
+
+                int[][] directions = {
+                    {0, -1},
+                    {1, 0},
+                    {0, 1},
+                    {-1, 0}
+                };
+
+                for (int[] direction : directions) {
+                    int neighbourX = x + direction[0];
+                    int neighbourY = y + direction[1];
+
+                    if (
+                        neighbourX < 0
+                            || neighbourX >= world.getWidth()
+                            || neighbourY < 0
+                            || neighbourY >= world.getHeight()
+                    ) {
+                        continue;
+                    }
+
+                    assertThat(
+                        world
+                            .getTile(
+                                neighbourX,
+                                neighbourY
+                            )
+                            .getTerrainType()
+                    ).isNotEqualTo(TerrainType.OCEAN);
+                }
+            });
+    }
 }
