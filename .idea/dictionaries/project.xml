@@ -4,6 +4,7 @@
       <w>aléatoire</w>
       <w>autorisée</w>
       <w>erreur</w>
+      <w>forêt</w>
       <w>générateur</w>
       <w>générer</w>
       <w>généré</w>
@@ -11,10 +12,14 @@
       <w>isready</w>
       <w>largeur</w>
       <w>maximale</w>
+      <w>montagne</w>
       <w>nombre</w>
       <w>obligatoire</w>
+      <w>plage</w>
+      <w>plaine</w>
       <w>simulateur</w>
       <w>survenue</w>
+      <w>visuel</w>
     </words>
   </dictionary>
 </component>

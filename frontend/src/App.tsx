@@ -2,6 +2,9 @@ import "./App.css";
 
 import { useWorld } from "./features/world/hooks/useWorld";
 
+import { TerrainLegend } from "./features/world/components/TerrainLegend";
+import { WorldMap } from "./features/world/components/WorldMap";
+
 const WORLD_WIDTH = 20;
 const WORLD_HEIGHT = 12;
 
@@ -50,41 +53,39 @@ function App() {
       )}
 
       {world && (
-        <section className="world-summary">
-          <h2>Monde généré</h2>
-
-          <dl>
+        <section className="world-panel">
+          <div className="world-panel-header">
             <div>
-              <dt>Largeur</dt>
-              <dd>{world.width}</dd>
+              <h2>Monde généré</h2>
+
+              <p>
+                {world.width} x {world.height} cases
+              </p>
             </div>
 
-            <div>
-              <dt>Hauteur</dt>
-              <dd>{world.height}</dd>
-            </div>
+            <dl className="world-statistics">
+              <div>
+                <dt>Largeur</dt>
+                <dd>{world.width}</dd>
+              </div>
 
-            <div>
-              <dt>Nombre de cases</dt>
-              <dd>{world.tiles.length}</dd>
-            </div>
-          </dl>
+              <div>
+                <dt>Hauteur</dt>
+                <dd>{world.height}</dd>
+              </div>
 
-          <h3>Premières cases</h3>
+              <div>
+                <dt>Cases</dt>
+                <dd>{world.tiles.length}</dd>
+              </div>
+            </dl>
+          </div>
 
-          <ul className="tile-list">
-            {world.tiles.slice(0, 10).map((tile) => (
-                <li
-                  key={`${tile.position.x}-${tile.position.y}`}
-                >
-                  <span>
-                    ({tile.position.x}, {tile.position.y})
-                  </span>
+          <div className="world-map-container">
+            <WorldMap world={world} />
+          </div>
 
-                  <strong>{tile.terrainType}</strong>
-                </li>
-            ))}
-          </ul>
+          <TerrainLegend world={world} />
         </section>
       )}
     </main>
