@@ -1,80 +1,93 @@
-import { useEffect, useState } from "react";
 import "./App.css";
 
-type SystemStatus = {
-  application: string;
-  status: string;
-  timestamp: string;
-};
+import { useWorld } from "./features/world/hooks/useWorld";
+
+const WORLD_WIDTH = 20;
+const WORLD_HEIGHT = 12;
 
 function App() {
-  const [systemStatus, setSystemStatus] = useState<SystemStatus | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const loadSystemStatus = async () => {
-      try {
-        const apiUrl = import.meta.env.VITE_API_URL ?? "";
-
-        console.log("API URL :", apiUrl);
-
-        const response = await fetch(`${apiUrl}/api/system/status`);
-
-        if (!response.ok) {
-          throw new Error(`Erreur HTTP ${response.status}`);
-        }
-
-        const data: SystemStatus = await response.json();
-        setSystemStatus(data);
-      } catch (requestError) {
-        const message =
-            requestError instanceof Error
-                ? requestError.message
-                : "Une erreur inconnue est survenue";
-
-        setError(message);
-      }
-    };
-
-    void loadSystemStatus();
-  }, []);
-
+  const {
+    world,
+    isLoading,
+    error,
+    regenerate,
+  } = useWorld({
+    width: WORLD_WIDTH,
+    height: WORLD_HEIGHT,
+  });
 
   return (
-      <main className="appication">
-        <section className="status-card">
+    <main className="application">
+      <header className="application-header">
+        <div>
           <h1>Chronicles</h1>
-
           <p>Simulateur de civilisation</p>
+        </div>
 
-          {systemStatus && (
-              <div className="success">
-                <strong>Backend connecté</strong>
+        <button
+            type="button"
+            onClick={() => void regenerate()}
+            disabled={isLoading}
+        >
+          {isLoading
+              ? "Génération..."
+              : "Générer un nouveau monde"
+          }
+        </button>
+      </header>
 
-                <dl>
-                  <div>
-                    <dt>Application</dt>
-                    <dd>{systemStatus.application}</dd>
-                  </div>
-
-                  <div>
-                    <dt>Etat</dt>
-                    <dd>{systemStatus.status}</dd>
-                  </div>
-                </dl>
-              </div>
-          )}
-
-          {error && (
-              <div className="error">
-                <strong>Connexion impossible</strong>
-                <p>{error}</p>
-              </div>
-          )}
-
-          {!systemStatus && !error && <p>Connexion au serveur...</p>}
+      {error && (
+        <section className="message message-error">
+          <strong>Impossible de générer le monde</strong>
+          <p>{error}</p>
         </section>
-      </main>
+      )}
+
+      {isLoading && !world && (
+        <section className="message">
+          <p>Génération du monde en cours...</p>
+        </section>
+      )}
+
+      {world && (
+        <section className="world-summary">
+          <h2>Monde généré</h2>
+
+          <dl>
+            <div>
+              <dt>Largeur</dt>
+              <dd>{world.width}</dd>
+            </div>
+
+            <div>
+              <dt>Hauteur</dt>
+              <dd>{world.height}</dd>
+            </div>
+
+            <div>
+              <dt>Nombre de cases</dt>
+              <dd>{world.tiles.length}</dd>
+            </div>
+          </dl>
+
+          <h3>Premières cases</h3>
+
+          <ul className="tile-list">
+            {world.tiles.slice(0, 10).map((tile) => (
+                <li
+                  key={`${tile.position.x}-${tile.position.y}`}
+                >
+                  <span>
+                    ({tile.position.x}, {tile.position.y})
+                  </span>
+
+                  <strong>{tile.terrainType}</strong>
+                </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </main>
   );
 }
 

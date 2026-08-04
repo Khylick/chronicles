@@ -2,54 +2,136 @@
   min-height: 100vh;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 body {
+  min-width: 320px;
+  min-height: 100vh;
   margin: 0;
   font-family:
-          Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Inter,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
           sans-serif;
-  background: #101820;
-  color: #f5f5f5;
+  color: #f4f6f8;
+  background: #0f171d;
+}
+
+button,
+input {
+  font: inherit;
 }
 
 .application {
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
+  width: min(1100px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0;
 }
 
-.status-card {
-  width: min(500px, calc(100% - 48px));
-  padding: 32px;
-  border: 1px solid #38444d;
-  border-radius: 16px;
-  background: #18242d;
-}
-
-.status-card h1 {
-  margin-top: 0;
-  font-size: 3rem;
-}
-
-.success {
-  margin-top: 24px;
-  padding: 16px;
-  border-radius: 8px;
-  background: rgba(73, 170, 90, 0.15);
-}
-
-.error {
-  margin-top: 24px;
-  padding: 16px;
-  border-radius: 8px;
-  background: rgba(210, 70, 70, 0.15);
-}
-
-dl div {
+.application-header {
   display: flex;
+  align-items: center;
   justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.application-header h1 {
+  margin: 0;
+  font-size: clamp(2rem, 6vw, 4rem);
+}
+
+.application-header p {
+  margin: 4px 0 0;
+  color: #aebbc5;
+}
+
+.application-header button {
+  padding: 12px 18px;
+  border: 0;
+  border-radius: 8px;
+  font-weight: 700;
+  color: #142018;
+  background: #9bd18b;
+  cursor: pointer;
+}
+
+.application-header button:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.application-header button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.message,
+.world-summary {
+  padding: 24px;
+  border: 1px solid #34434e;
+  border-radius: 12px;
+  background: #19252d;
+}
+
+.message-error {
+  border-color: #8d4242;
+  background: #321f22;
+}
+
+.world-summary h2 {
+  margin-top: 0;
+}
+
+.world-summary dl {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(140px, 1fr)
+  );
   gap: 16px;
 }
 
-dd {
+.world-summary dl div {
+  padding: 16px;
+  border-radius: 8px;
+  background: #111b21;
+}
+
+.world-summary dt {
+  margin-bottom: 8px;
+  color: #aebbc5;
+}
+
+.world-summary dd {
   margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.tile-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tile-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 16px;
+  border-radius: 6px;
+  background: #111b21;
+}
+
+@media (max-width: 650px) {
+  .application-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
 }
