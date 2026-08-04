@@ -3,6 +3,7 @@ package fr.khylick.chronicles.world.application;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.random.RandomGenerator;
 
 import fr.khylick.chronicles.world.domain.Position;
@@ -15,7 +16,7 @@ public class RandomWorldGenerator implements WorldGenerator {
     private final RandomGenerator randomGenerator;
 
     public RandomWorldGenerator() {
-        this(RandomGenerator.getDefault());
+        this(new Random());
     }
 
     public RandomWorldGenerator(RandomGenerator randomGenerator) {
