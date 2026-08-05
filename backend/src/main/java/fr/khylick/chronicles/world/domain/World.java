@@ -2,15 +2,20 @@ package fr.khylick.chronicles.world.domain;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 public class World {
 
     private final int width;
     private final int height;
     private final List<Tile> tiles;
+    private final List<Civilization> civilizations;
 
-    public World(int width, int height, List<Tile> tiles) {
+    public World(
+        int width,
+        int height,
+        List<Tile> tiles,
+        List<Civilization> civilizations
+    ) {
         if (width <= 0) {
             throw new IllegalArgumentException(
                 "La largeur du monde doit être strictement positive"
@@ -28,6 +33,11 @@ public class World {
             "La liste des cases du monde est obligatoire"
         );
 
+        Objects.requireNonNull(
+            civilizations,
+            "La liste des civilisations est obligatoire"
+        );
+
         int expectedTileCount = width * height;
 
         if (tiles.size() != expectedTileCount) {
@@ -42,6 +52,15 @@ public class World {
         this.width = width;
         this.height = height;
         this.tiles = List.copyOf(tiles);
+        this.civilizations = List.copyOf(civilizations);
+    }
+
+    public World(
+        int width,
+        int height,
+        List<Tile> tiles
+    ) {
+        this(width, height, tiles, List.of());
     }
 
     public int getWidth() {
@@ -67,6 +86,10 @@ public class World {
         return tiles.get(y * width + x);
     }
 
+    public List<Civilization> getCivilizations() {
+        return civilizations;
+    }
+
     private static void validateTilePosition(
         int width,
         int height,
@@ -83,7 +106,7 @@ public class World {
             );
         }
 
-        Boolean containsOutOfBoundsPosition = tiles.stream()
+        boolean containsOutOfBoundsPosition = tiles.stream()
             .map(Tile::getPosition)
             .anyMatch(position ->
                 position.x() >= width

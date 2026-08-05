@@ -13,6 +13,13 @@ export function WorldMap({ world }: WorldMapProps) {
         gridTemplateColumns: `repeat(${world.width}, minmax(0, 1fr))`,
     };
 
+    const civilizationsByPosition = new Map(
+        world.civilizations.map((civilization) => [
+           `${civilization.capital.position.x}-${civilization.capital.position.y}`,
+           civilization
+        ]),
+    );
+
     return (
         <div
             className="world-map"
@@ -35,24 +42,40 @@ export function WorldMap({ world }: WorldMapProps) {
                 })
                 .join(", ");
 
+                const positionKey =
+                    `${tile.position.x}-${tile.position.y}`;
+
+                const civilization =
+                    civilizationsByPosition.get(positionKey);
+
                 return (
                     <div
-                        key={`${tile.position.x}-${tile.position.y}`}
+                        key={positionKey}
                         className="world-tile"
                         style={{
                             backgroundColor: terrainVisual.color,
                         }}
                         role="gridcell"
-                        title={
-                            [
-                                `${terrainVisual.label} — (${tile.position.x}, ${tile.position.y})`,
-                                resourcesLabel,
-                            ]
+                        title={[
+                            `${terrainVisual.label} — (${tile.position.x}, ${tile.position.y})`,
+                            resourcesLabel,
+                            civilization
+                                ? `${civilization.name} — capitale : ${civilization.capital.name}`
+                                : "",
+                        ]
                             .filter(Boolean)
-                            .join("\n")
-                        }
-                        aria-label={`${terrainVisual.label}, position ${tile.position.x}, ${tile.position.y}`}
-                    />
+                            .join("\n")}
+                    >
+                        {civilization && (
+                            <span
+                                className="capital-marker"
+                                style={{
+                                    backgroundColor: civilization.color,
+                                }}
+                                aria-label={`Capitale ${civilization.capital.name} des ${civilization.name}`}
+                            />
+                        )}
+                    </div>
                 )
             })}
         </div>

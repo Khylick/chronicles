@@ -307,4 +307,14 @@ class ContinentWorldGeneratorTest {
                 ).isEqualTo(4)
             );
     }
+
+    @Test
+    void shouldGenerateCivilizations() {
+        World world =
+            new ContinentWorldGenerator(new Random(42))
+                .generate(80, 48);
+
+        assertThat(world.getCivilizations())
+            .isNotEmpty();
+    }
 }

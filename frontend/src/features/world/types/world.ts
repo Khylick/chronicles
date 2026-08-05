@@ -21,6 +21,7 @@ export interface World {
     width: number;
     height: number;
     tiles: Tile[];
+    civilizations: Civilization[];
 }
 
 export type ResourceType =
@@ -31,4 +32,17 @@ export type ResourceType =
 
 export interface TileResources {
     values: Partial<Record<ResourceType, number>>;
+}
+
+export interface Capital {
+    id: string;
+    name: string;
+    position: Position;
+}
+
+export interface Civilization {
+    id: string;
+    name: string;
+    color: string;
+    capital: Capital;
 }

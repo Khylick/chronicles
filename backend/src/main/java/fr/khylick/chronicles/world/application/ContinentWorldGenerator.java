@@ -22,14 +22,18 @@ public class ContinentWorldGenerator implements WorldGenerator {
     private static final double HILL_THRESHOLD = 0.62;
     private static final double FOREST_THRESHOLD = 0.58;
 
+    private static final int DEFAULT_CIVILIZATION_COUNT = 4;
+
     private final RandomGenerator randomGenerator;
+    private final CivilizationGenerator civilizationGenerator;
 
     private final TileResourcesGenerator tileResourcesGenerator;
 
     public ContinentWorldGenerator() {
         this(
             new Random(),
-            new TerrainTileResourcesGenerator()
+            new TerrainTileResourcesGenerator(),
+            new DefaultCivilizationGenerator()
         );
     }
 
@@ -38,13 +42,17 @@ public class ContinentWorldGenerator implements WorldGenerator {
     ) {
         this(
             randomGenerator,
-            new TerrainTileResourcesGenerator()
+            new TerrainTileResourcesGenerator(),
+            new DefaultCivilizationGenerator(
+                randomGenerator
+            )
         );
     }
 
     public ContinentWorldGenerator(
         RandomGenerator randomGenerator,
-        TileResourcesGenerator tileResourcesGenerator
+        TileResourcesGenerator tileResourcesGenerator,
+        CivilizationGenerator civilizationGenerator
     ) {
         this.randomGenerator = Objects.requireNonNull(
             randomGenerator,
@@ -55,6 +63,12 @@ public class ContinentWorldGenerator implements WorldGenerator {
             Objects.requireNonNull(
                 tileResourcesGenerator,
                 "Le générateur de ressources est obligatoire"
+            );
+
+        this.civilizationGenerator =
+            Objects.requireNonNull(
+                civilizationGenerator,
+                "Le générateur de civilisations est obligatoire"
             );
     }
 
@@ -114,7 +128,21 @@ public class ContinentWorldGenerator implements WorldGenerator {
             height
         );
 
-        return new World(width, height, tiles);
+        World worldWithoutCivilizations =
+            new World(width, height, tiles);
+
+        List<Civilization> civilizations =
+            civilizationGenerator.generate(
+                worldWithoutCivilizations,
+                DEFAULT_CIVILIZATION_COUNT
+            );
+
+        return new World(
+            width,
+            height,
+            tiles,
+            civilizations
+        );
     }
 
     private boolean[][] generateInitialLandMap(

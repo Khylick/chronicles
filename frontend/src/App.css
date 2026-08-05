@@ -188,6 +188,50 @@ input {
   border-radius: 4px;
 }
 
+.world-tile {
+  position: relative;
+}
+
+.capital-marker {
+  position: absolute;
+  inset: 20%;
+  display: block;
+  border: 2px solid rgb(255 255 255 / 90%);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 1px rgb(0 0 0 / 70%),
+    0 0 8px rgb(0 0 0 / 60%);
+}
+
+.civilization-list {
+  margin-top: 24px;
+}
+
+.civilization-list h3 {
+  margin-bottom: 12px;
+}
+
+.civilization-list ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.civilization-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.civilization-color {
+  width: 16px;
+  height: 16px;
+  border: 1px solid rgb(255 255 255 / 40%);
+  border-radius: 50%;
+}
+
 @media (max-width: 750px) {
   .world-panel-header {
     flex-direction: column;

@@ -86,6 +86,36 @@ function App() {
           </div>
 
           <TerrainLegend world={world} />
+
+          <section className="civilization-list">
+            <h3>Civilisations</h3>
+
+            <ul>
+              {world.civilizations.map((civilization) => (
+                  <li key={civilization.id}>
+                    <span
+                      className="civilization-color"
+                      style={{
+                        backgroundColor: civilization.color,
+                      }}
+                    />
+
+                    <span>
+                      <strong>{civilization.name}</strong>
+                      {" - "}
+                      {civilization.capital.name}
+                      {" "}
+                      (
+                      {civilization.capital.position.x},
+                      {" "}
+                      {civilization.capital.position.y}
+                      )
+                    </span>
+                  </li>
+              ))}
+            </ul>
+          </section>
+
         </section>
       )}
     </main>
