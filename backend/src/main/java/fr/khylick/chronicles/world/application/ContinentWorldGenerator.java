@@ -6,10 +6,7 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.random.RandomGenerator;
 
-import fr.khylick.chronicles.world.domain.Position;
-import fr.khylick.chronicles.world.domain.TerrainType;
-import fr.khylick.chronicles.world.domain.Tile;
-import fr.khylick.chronicles.world.domain.World;
+import fr.khylick.chronicles.world.domain.*;
 
 public class ContinentWorldGenerator implements WorldGenerator {
 
@@ -27,15 +24,38 @@ public class ContinentWorldGenerator implements WorldGenerator {
 
     private final RandomGenerator randomGenerator;
 
+    private final TileResourcesGenerator tileResourcesGenerator;
+
     public ContinentWorldGenerator() {
-        this(new Random());
+        this(
+            new Random(),
+            new TerrainTileResourcesGenerator()
+        );
     }
 
-    public ContinentWorldGenerator(RandomGenerator randomGenerator) {
+    public ContinentWorldGenerator(
+        RandomGenerator randomGenerator
+    ) {
+        this(
+            randomGenerator,
+            new TerrainTileResourcesGenerator()
+        );
+    }
+
+    public ContinentWorldGenerator(
+        RandomGenerator randomGenerator,
+        TileResourcesGenerator tileResourcesGenerator
+    ) {
         this.randomGenerator = Objects.requireNonNull(
             randomGenerator,
             "Le générateur aléatoire est obligatoire"
         );
+
+        this.tileResourcesGenerator =
+            Objects.requireNonNull(
+                tileResourcesGenerator,
+                "Le générateur de ressources est obligatoire"
+            );
     }
 
     @Override
@@ -197,10 +217,14 @@ public class ContinentWorldGenerator implements WorldGenerator {
                         height
                     );
 
+                TileResources resources =
+                    tileResourcesGenerator.generate(terrainType);
+
                 tiles.add(
                     new Tile(
                         new Position(x, y),
-                        terrainType
+                        terrainType,
+                        resources
                     )
                 );
             }

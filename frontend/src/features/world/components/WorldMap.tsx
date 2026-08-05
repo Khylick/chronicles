@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 
 import { TERRAIN_VISUALS } from "../config/terrain";
+import { RESOURCE_LABELS } from "../config/resources";
 import type { World } from "../types/world";
 
 interface WorldMapProps {
@@ -23,6 +24,17 @@ export function WorldMap({ world }: WorldMapProps) {
                 const terrainVisual =
                     TERRAIN_VISUALS[tile.terrainType];
 
+                const resourcesLabel = Object.entries(
+                    tile.resources.values,
+                )
+                .map(([resourceType, quantity]) => {
+                    const typedResourceType =
+                        resourceType as keyof typeof RESOURCE_LABELS;
+
+                    return `${RESOURCE_LABELS[typedResourceType]} : ${quantity}`;
+                })
+                .join(", ");
+
                 return (
                     <div
                         key={`${tile.position.x}-${tile.position.y}`}
@@ -31,7 +43,14 @@ export function WorldMap({ world }: WorldMapProps) {
                             backgroundColor: terrainVisual.color,
                         }}
                         role="gridcell"
-                        title={`${terrainVisual.label} - (${tile.position.x}, ${tile.position.y})`}
+                        title={
+                            [
+                                `${terrainVisual.label} — (${tile.position.x}, ${tile.position.y})`,
+                                resourcesLabel,
+                            ]
+                            .filter(Boolean)
+                            .join("\n")
+                        }
                         aria-label={`${terrainVisual.label}, position ${tile.position.x}, ${tile.position.y}`}
                     />
                 )

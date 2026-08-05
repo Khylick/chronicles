@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Random;
 
+import fr.khylick.chronicles.world.domain.ResourceType;
 import org.junit.jupiter.api.Test;
 
 import fr.khylick.chronicles.world.domain.TerrainType;
@@ -272,5 +273,38 @@ class ContinentWorldGeneratorTest {
                     ).isNotEqualTo(TerrainType.OCEAN);
                 }
             });
+    }
+
+    @Test
+    void shouldGenerateResourcesForEveryTile() {
+        World world =
+            new ContinentWorldGenerator(new Random(42))
+                .generate(40, 24);
+
+        assertThat(world.getTiles())
+            .allSatisfy(tile ->
+                assertThat(tile.getResources())
+                    .isNotNull()
+            );
+    }
+
+    @Test
+    void shouldGenerateFoodOnPlainTiles() {
+        World world =
+            new ContinentWorldGenerator(new Random(42))
+                .generate(80, 48);
+
+        world.getTiles()
+            .stream()
+            .filter(tile ->
+                tile.getTerrainType()
+                    == TerrainType.PLAIN
+            )
+            .forEach(tile ->
+                assertThat(
+                    tile.getResources()
+                        .get(ResourceType.FOOD)
+                ).isEqualTo(4)
+            );
     }
 }

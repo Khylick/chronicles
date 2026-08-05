@@ -12,10 +12,10 @@ class WorldTest {
     @Test
     void shouldCreateWorldWithExpectedDimensionsAndTiles() {
         List<Tile> tiles = List.of(
-            new Tile(new Position(0, 0), TerrainType.OCEAN),
-            new Tile(new Position(1, 0), TerrainType.BEACH),
-            new Tile(new Position(0, 1), TerrainType.PLAIN),
-            new Tile(new Position(1, 1), TerrainType.FOREST)
+            new Tile(new Position(0, 0), TerrainType.OCEAN, TileResources.empty()),
+            new Tile(new Position(1, 0), TerrainType.BEACH, TileResources.empty()),
+            new Tile(new Position(0, 1), TerrainType.PLAIN, TileResources.empty()),
+            new Tile(new Position(1, 1), TerrainType.FOREST, TileResources.empty())
         );
 
         World world = new World(2, 2, tiles);
@@ -30,7 +30,7 @@ class WorldTest {
     @Test
     void shouldRejectWorldWithIncorrectTileCount() {
         List<Tile> tiles = List.of(
-            new Tile(new Position(0, 0), TerrainType.OCEAN)
+            new Tile(new Position(0, 0), TerrainType.OCEAN, TileResources.empty())
         );
 
         assertThatThrownBy(() -> new World(2, 2, tiles))
@@ -41,8 +41,8 @@ class WorldTest {
     @Test
     void shouldRejectDuplicateTilePositions() {
         List<Tile> tiles = List.of(
-            new Tile(new Position(0, 0), TerrainType.OCEAN),
-            new Tile(new Position(0, 0), TerrainType.BEACH)
+            new Tile(new Position(0, 0), TerrainType.OCEAN, TileResources.empty()),
+            new Tile(new Position(0, 0), TerrainType.BEACH, TileResources.empty())
         );
 
         assertThatThrownBy(() -> new World(2, 1, tiles))
@@ -53,8 +53,8 @@ class WorldTest {
     @Test
     void shouldRejectTileOutsideWorldBounds() {
         List<Tile> tiles = List.of(
-            new Tile(new Position(0, 0), TerrainType.OCEAN),
-            new Tile(new Position(2, 0), TerrainType.BEACH)
+            new Tile(new Position(0, 0), TerrainType.OCEAN, TileResources.empty()),
+            new Tile(new Position(2, 0), TerrainType.BEACH, TileResources.empty())
         );
 
         assertThatThrownBy(() -> new World(2, 1, tiles))
