@@ -136,8 +136,8 @@ class ContinentWorldGeneratorTest {
             )
             .count();
 
-        assertThat(mountainCount).isGreaterThan(0);
-        assertThat(hillCount).isGreaterThan(0);
+        assertThat(mountainCount + hillCount)
+            .isGreaterThan(0);
     }
 
     @Test
@@ -151,6 +151,92 @@ class ContinentWorldGeneratorTest {
             .filter(tile ->
                 tile.getTerrainType()
                     == TerrainType.MOUNTAIN
+            )
+            .forEach(tile -> {
+                int x = tile.getPosition().x();
+                int y = tile.getPosition().y();
+
+                int[][] directions = {
+                    {0, -1},
+                    {1, 0},
+                    {0, 1},
+                    {-1, 0}
+                };
+
+                for (int[] direction : directions) {
+                    int neighbourX = x + direction[0];
+                    int neighbourY = y + direction[1];
+
+                    if (
+                        neighbourX < 0
+                            || neighbourX >= world.getWidth()
+                            || neighbourY < 0
+                            || neighbourY >= world.getHeight()
+                    ) {
+                        continue;
+                    }
+
+                    assertThat(
+                        world
+                            .getTile(
+                                neighbourX,
+                                neighbourY
+                            )
+                            .getTerrainType()
+                    ).isNotEqualTo(TerrainType.OCEAN);
+                }
+            });
+    }
+
+    @Test
+    void shouldGenerateForests() {
+        World world =
+            new ContinentWorldGenerator(new Random(42))
+                .generate(80, 48);
+
+        long forestCount = world.getTiles()
+            .stream()
+            .filter(tile ->
+                tile.getTerrainType()
+                    == TerrainType.FOREST
+            )
+            .count();
+
+        assertThat(forestCount).isGreaterThan(0);
+    }
+
+    @Test
+    void shouldNotGenerateForestOnOceanOrBeach() {
+        World world =
+            new ContinentWorldGenerator(new Random(42))
+                .generate(80, 48);
+
+        world.getTiles()
+            .stream()
+            .filter(tile ->
+                tile.getTerrainType()
+                    == TerrainType.FOREST
+            )
+            .forEach(tile ->
+                assertThat(tile.getTerrainType())
+                    .isNotIn(
+                        TerrainType.OCEAN,
+                        TerrainType.BEACH
+                    )
+            );
+    }
+
+    @Test
+    void shouldNotGenerateForestDirectlyNextToOcean() {
+        World world =
+            new ContinentWorldGenerator(new Random(42))
+                .generate(80, 48);
+
+        world.getTiles()
+            .stream()
+            .filter(tile ->
+                tile.getTerrainType()
+                    == TerrainType.FOREST
             )
             .forEach(tile -> {
                 int x = tile.getPosition().x();

@@ -19,6 +19,11 @@ public class ContinentWorldGenerator implements WorldGenerator {
     private static final int SMOOTHING_PASSES = 5;
 
     private static final int ELEVATION_SMOOTHING_PASSES = 2;
+    private static final int MOISTURE_SMOOTHING_PASSES = 3;
+
+    private static final double MOUNTAIN_THRESHOLD = 0.78;
+    private static final double HILL_THRESHOLD = 0.62;
+    private static final double FOREST_THRESHOLD = 0.58;
 
     private final RandomGenerator randomGenerator;
 
@@ -54,8 +59,27 @@ public class ContinentWorldGenerator implements WorldGenerator {
             pass < ELEVATION_SMOOTHING_PASSES;
             pass++
         ) {
-            elevationMap = smoothElevationMap(
+            elevationMap = smoothScalarMap(
                 elevationMap,
+                landMap,
+                width,
+                height
+            );
+        }
+
+        double[][] moistureMap = generateMoistureMap(
+            landMap,
+            width,
+            height
+        );
+
+        for (
+            int pass = 0;
+            pass < MOISTURE_SMOOTHING_PASSES;
+            pass++
+        ) {
+            moistureMap = smoothScalarMap(
+                moistureMap,
                 landMap,
                 width,
                 height
@@ -65,6 +89,7 @@ public class ContinentWorldGenerator implements WorldGenerator {
         List<Tile> tiles = generateTiles(
             landMap,
             elevationMap,
+            moistureMap,
             width,
             height
         );
@@ -95,9 +120,9 @@ public class ContinentWorldGenerator implements WorldGenerator {
                     distanceFromCenter / maximumDistance;
 
                 // Réglage de base
-                double landProbability = 0.72 - normalizedDistance * 0.52;
+                //double landProbability = 0.72 - normalizedDistance * 0.52;
                 // Pour davantage de terre :
-                // double landProbability = 0.80 - normalizedDistance * 0.50;
+                double landProbability = 0.80 - normalizedDistance * 0.50;
                 // Pour davantage d'océan :
                 // double landProbability = 0.65 - normalizedDistance * 0.55;
 
@@ -152,6 +177,7 @@ public class ContinentWorldGenerator implements WorldGenerator {
     private List<Tile> generateTiles(
         boolean[][] landMap,
         double[][] elevationMap,
+        double[][] moistureMap,
         int width,
         int height
     ) {
@@ -164,6 +190,7 @@ public class ContinentWorldGenerator implements WorldGenerator {
                     determineTerrainType(
                         landMap,
                         elevationMap,
+                        moistureMap,
                         x,
                         y,
                         width,
@@ -185,6 +212,7 @@ public class ContinentWorldGenerator implements WorldGenerator {
     private static TerrainType determineTerrainType(
             boolean[][] landMap,
             double[][] elevationMap,
+            double[][] moistureMap,
             int x,
             int y,
             int width,
@@ -207,13 +235,19 @@ public class ContinentWorldGenerator implements WorldGenerator {
         double elevation = elevationMap[y][x];
 
         // Régler le paramêtre pour plus ou moins de montagnes.
-        if (elevation >= 0.72) {
+        if (elevation >= MOUNTAIN_THRESHOLD) {
             return TerrainType.MOUNTAIN;
         }
 
         // Régler le paramêtre pour plus ou moins de plaines.
-        if (elevation >= 0.59) {
+        if (elevation >= HILL_THRESHOLD) {
             return TerrainType.HILL;
+        }
+
+        double moisture = moistureMap[y][x];
+
+        if (moisture >= FOREST_THRESHOLD) {
+            return TerrainType.FOREST;
         }
 
         return TerrainType.PLAIN;
@@ -376,11 +410,11 @@ public class ContinentWorldGenerator implements WorldGenerator {
         return elevationMap;
     }
 
-    private static double[][] smoothElevationMap(
+    private static double[][] smoothScalarMap(
         double[][] currentMap,
         boolean[][] landMap,
-            int width,
-            int height
+        int width,
+        int height
     ) {
         double[][] smoothedMap =
             new double[height][width];
@@ -392,8 +426,9 @@ public class ContinentWorldGenerator implements WorldGenerator {
                     continue;
                 }
 
-                double total = 0.0;
-                int count = 0;
+                double weightedTotal =
+                    currentMap[y][x] * 2.0;
+                double totalWeight = 2.0;
 
                 for (
                     int offsetY = -1;
@@ -405,6 +440,10 @@ public class ContinentWorldGenerator implements WorldGenerator {
                         offsetX <= 1;
                         offsetX++
                     ) {
+                        if (offsetX == 0 && offsetY == 0) {
+                            continue;
+                        }
+
                         int neighbourX = x + offsetX;
                         int neighbourY = y + offsetY;
 
@@ -413,26 +452,125 @@ public class ContinentWorldGenerator implements WorldGenerator {
                                 || neighbourX >= width
                                 || neighbourY < 0
                                 || neighbourY >= height
+                                || !landMap[neighbourY][neighbourX]
                         ) {
                             continue;
                         }
 
-                        if (!landMap[neighbourY][neighbourX]) {
-                            continue;
-                        }
-
-                        total += currentMap[neighbourY][neighbourX];
-                        count++;
+                        weightedTotal += currentMap[neighbourY][neighbourX];
+                        totalWeight += 1.0;
                     }
                 }
 
-                smoothedMap[y][x] =
-                    count == 0
-                        ? currentMap[y][x]
-                        : total / count;
+                smoothedMap[y][x] = weightedTotal / totalWeight;
             }
         }
 
         return smoothedMap;
+    }
+
+    private double[][] generateMoistureMap(
+        boolean[][] landMap,
+        int width,
+        int height
+    ) {
+        double[][] moistureMap =
+            new double[height][width];
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (!landMap[y][x]) {
+                    moistureMap[y][x] = 0.0;
+                    continue;
+                }
+
+                double coastalInfluence =
+                    calculateCoastalInfluence(
+                        landMap,
+                        x,
+                        y,
+                        width,
+                        height
+                    );
+
+                double randomFactor =
+                    randomGenerator.nextDouble();
+
+                moistureMap[y][x] =
+                    clamp(
+                        coastalInfluence * 0.45
+                            + randomFactor * 0.55
+                    );
+            }
+        }
+
+        return moistureMap;
+    }
+
+    private static double calculateCoastalInfluence(
+        boolean[][] landMap,
+        int x,
+        int y,
+        int width,
+        int height
+    ) {
+        final int searchRadius = 4;
+        int minimumOceanDistance = searchRadius + 1;
+
+        for (
+            int offsetY = -searchRadius;
+            offsetY <= searchRadius;
+            offsetY++
+        ) {
+            for (
+                int offsetX = -searchRadius;
+                offsetX <= searchRadius;
+                offsetX++
+            ) {
+                int distance =
+                    Math.abs(offsetX) + Math.abs(offsetY);
+
+                if (distance == 0 || distance > searchRadius) {
+                    continue;
+                }
+
+                int neighbourX = x + offsetX;
+                int neighbourY = y + offsetY;
+
+                // L'extérieur de la carte est considéré comme de l'océan.
+                if (
+                    neighbourX < 0
+                        || neighbourX >= width
+                        || neighbourY < 0
+                        || neighbourY >= height
+                ) {
+                    minimumOceanDistance = Math.min(
+                        minimumOceanDistance,
+                        distance
+                    );
+
+                    continue;
+                }
+
+                if (!landMap[neighbourY][neighbourX]) {
+                    minimumOceanDistance = Math.min(
+                        minimumOceanDistance,
+                        distance
+                    );
+                }
+            }
+        }
+
+        if (minimumOceanDistance > searchRadius) {
+            return 0.0;
+        }
+
+        return 1.0
+            - (minimumOceanDistance - 1.0)
+                / searchRadius;
+    }
+
+    private static double clamp(double value) {
+        return Math.max(0.0, Math.min(1.0, value));
     }
 }
