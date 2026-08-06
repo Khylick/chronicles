@@ -226,8 +226,14 @@ input {
 
 .civilization-list li {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgb(255 255 255 / 8%);
+}
+
+.civilization-list li:last-child {
+  border-bottom: 0;
 }
 
 .civilization-color {
@@ -245,6 +251,19 @@ input {
 .civilization-statistics {
   color: #aebbc5;
   font-size: 0.9rem;
+}
+
+.food-balance {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.food-balance--positive {
+  color: #9bd18b;
+}
+
+.food-balance--negative {
+  color: #ff8f8f;
 }
 
 .world-tile--claimed::after {

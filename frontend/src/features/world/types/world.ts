@@ -23,6 +23,7 @@ export interface World {
     tiles: Tile[];
     civilizations: Civilization[];
     territories: Territory[];
+    territoryProductions: TerritoryProduction[];
 }
 
 export type ResourceType =
@@ -58,4 +59,9 @@ export interface Population {
     inhabitants: number;
     growthRate: number;
     foodConsumptionPerTurn: number;
+}
+
+export interface TerritoryProduction {
+    civilizationId: string;
+    values: Partial<Record<ResourceType, number>>;
 }

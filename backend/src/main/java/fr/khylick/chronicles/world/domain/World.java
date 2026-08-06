@@ -10,13 +10,15 @@ public class World {
     private final List<Tile> tiles;
     private final List<Civilization> civilizations;
     private final List<Territory> territories;
+    private final List<TerritoryProduction> territoryProductions;
 
     public World(
         int width,
         int height,
         List<Tile> tiles,
         List<Civilization> civilizations,
-        List<Territory> territories
+        List<Territory> territories,
+        List<TerritoryProduction> territoryProductions
     ) {
         if (width <= 0) {
             throw new IllegalArgumentException(
@@ -45,6 +47,11 @@ public class World {
             "La liste des territoires est obligatoire"
         );
 
+        Objects.requireNonNull(
+            territoryProductions,
+            "La liste des productions est obligatoire"
+        );
+
         int expectedTileCount = width * height;
 
         if (tiles.size() != expectedTileCount) {
@@ -61,6 +68,7 @@ public class World {
         this.tiles = List.copyOf(tiles);
         this.civilizations = List.copyOf(civilizations);
         this.territories = List.copyOf(territories);
+        this.territoryProductions = List.copyOf(territoryProductions);
     }
 
     public World(
@@ -72,6 +80,7 @@ public class World {
             width,
             height,
             tiles,
+            List.of(),
             List.of(),
             List.of()
         );
@@ -88,6 +97,24 @@ public class World {
             height,
             tiles,
             civilizations,
+            List.of(),
+            List.of()
+        );
+    }
+
+    public World(
+        int width,
+        int height,
+        List<Tile> tiles,
+        List<Civilization> civilizations,
+        List<Territory> territories
+    ) {
+        this(
+            width,
+            height,
+            tiles,
+            civilizations,
+            territories,
             List.of()
         );
     }
@@ -121,6 +148,10 @@ public class World {
 
     public List<Territory> getTerritories() {
         return territories;
+    }
+
+    public List<TerritoryProduction> getTerritoryProductions() {
+        return territoryProductions;
     }
 
     private static void validateTilePosition(

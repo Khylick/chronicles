@@ -317,4 +317,38 @@ class ContinentWorldGeneratorTest {
         assertThat(world.getCivilizations())
             .isNotEmpty();
     }
+
+    @Test
+    void shouldCalculateProductionForEveryCivilization() {
+        World world =
+            new ContinentWorldGenerator(new Random(42))
+                .generate(80, 48);
+
+        assertThat(world.getTerritoryProductions())
+            .hasSameSizeAs(world.getCivilizations());
+
+        world.getCivilizations()
+            .forEach(civilization ->
+                assertThat(world.getTerritoryProductions())
+                    .anySatisfy(production ->
+                        assertThat(
+                            production.getCivilizationId()
+                        ).isEqualTo(civilization.getId())
+                    )
+            );
+    }
+
+    @Test
+    void shouldGeneratePositiveFoodProduction() {
+        World world =
+            new ContinentWorldGenerator(new Random(42))
+                .generate(80, 48);
+
+        assertThat(world.getTerritoryProductions())
+            .allSatisfy(production ->
+                assertThat(
+                    production.get(ResourceType.FOOD)
+                ).isPositive()
+            );
+    }
 }

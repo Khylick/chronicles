@@ -5,6 +5,8 @@ import { useWorld } from "./features/world/hooks/useWorld";
 import { TerrainLegend } from "./features/world/components/TerrainLegend";
 import { WorldMap } from "./features/world/components/WorldMap";
 
+import { getProductionQuantity } from "./features/world/utils/resources";
+
 const WORLD_WIDTH = 80
 const WORLD_HEIGHT = 48;
 
@@ -98,6 +100,36 @@ function App() {
                       === civilization.id
                 );
 
+                const production =
+                    world.territoryProductions.find(
+                        (candidate) =>
+                            candidate.civilizationId === civilization.id
+                    );
+
+                const foodProduction = getProductionQuantity(
+                  production,
+                  "FOOD"
+                );
+                const woodProduction = getProductionQuantity(
+                  production,
+                  "WOOD"
+                );
+                const stoneProduction = getProductionQuantity(
+                  production,
+                  "STONE"
+                );
+                const oreProduction = getProductionQuantity(
+                  production,
+                  "ORE"
+                );
+
+                const foodConsumption =
+                  civilization.capital.population
+                    .foodConsumptionPerTurn;
+
+                const foodBalance =
+                  foodProduction - foodConsumption;
+
                 return (
                   <li key={civilization.id}>
                     <span
@@ -108,29 +140,50 @@ function App() {
                     />
 
                     <span className="civilization-details">
-                      <strong>{civilization.name}</strong>
-
-                      <span>
-                        {civilization.capital.name}
+                      <span className="civilization-name">
+                        <strong>{civilization.name}</strong>
                         {" — "}
-                        {civilization.capital.population.inhabitants.toLocaleString("fr-FR")}
-                        {" habitants"}
+                        {civilization.capital.name}
                       </span>
 
-                      <span className="civilization-statistics">
-                        Croissance potentielle :{" "}
-                        {(civilization.capital.population.growthRate * 100).toLocaleString(
-                            "fr-FR",
-                            { maximumFractionDigits: 1 },
-                        )}
-                        {" %"}
-                        {" — "}
-                        Nourriture requise :{" "}
-                        {civilization.capital.population.foodConsumptionPerTurn}
-                        {" / tour"}
+                      <span>
+                        {civilization.capital.population
+                          .inhabitants
+                          .toLocaleString("fr-FR")}
+                        {" habitants"}
                         {" — "}
                         {territory?.positions.length ?? 0}
                         {" cases"}
+                      </span>
+
+                      <span className="civilization-statistics">
+                        Production :
+                        {" "}
+                        🍞 {foodProduction}
+                        {" · "}
+                        🪵 {woodProduction}
+                        {" · "}
+                        🪨 {stoneProduction}
+                        {" · "}
+                        ⛏️ {oreProduction}
+                      </span>
+
+                      <span
+                        className={[
+                          "food-balance",
+                          foodBalance >= 0
+                            ? "food-balance--positive"
+                            : "food-balance--negative",
+                        ].join(" ")}
+                      >
+                        Nourriture :
+                        {" "}
+                        {foodProduction}
+                        {" produite — "}
+                        {foodConsumption}
+                        {" consommée — solde "}
+                        {foodBalance >= 0 ? "+" : ""}
+                        {foodBalance}
                       </span>
                     </span>
                   </li>
@@ -138,7 +191,6 @@ function App() {
               })}
             </ul>
           </section>
-
         </section>
       )}
     </main>

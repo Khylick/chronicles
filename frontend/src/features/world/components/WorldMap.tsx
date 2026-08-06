@@ -81,6 +81,14 @@ export function WorldMap({ world }: WorldMapProps) {
                 const territoryCivilization =
                     territoryByPosition.get(positionKey);
 
+                const territoryProduction =
+                    territoryCivilization
+                        ? world.territoryProductions.find(
+                            (production) =>
+                                production.civilizationId === territoryCivilization.id,
+                        )
+                        : undefined;
+
                 return (
                     <div
                         key={positionKey}
@@ -109,6 +117,17 @@ export function WorldMap({ world }: WorldMapProps) {
                                     `Population : ${civilization.capital.population.inhabitants.toLocaleString("fr-FR")}`,
                                     `Consommation : ${civilization.capital.population.foodConsumptionPerTurn} nourriture / tour`,
                                 ].join("\n")
+                                : "",
+                            territoryProduction
+                                ? `Production territoriale : nourriture ${
+                                        territoryProduction.values.FOOD ?? 0
+                                    }, bois ${
+                                        territoryProduction.values.WOOD ?? 0
+                                    }, pierre ${
+                                        territoryProduction.values.STONE ?? 0
+                                    }, minerai ${
+                                        territoryProduction.values.ORE ?? 0
+                                    }`
                                 : "",
                         ]
                             .filter(Boolean)

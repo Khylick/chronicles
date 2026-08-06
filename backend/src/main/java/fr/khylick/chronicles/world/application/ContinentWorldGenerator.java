@@ -31,12 +31,15 @@ public class ContinentWorldGenerator implements WorldGenerator {
     private final TileResourcesGenerator tileResourcesGenerator;
     private final TerritoryGenerator territoryGenerator;
 
+    private final TerritoryProductionCalculator territoryProductionCalculator;
+
     public ContinentWorldGenerator() {
         this(
             new Random(),
             new TerrainTileResourcesGenerator(),
             new DefaultCivilizationGenerator(),
-            new InitialTerritoryGenerator()
+            new InitialTerritoryGenerator(),
+            new DefaultTerritoryProductionCalculator()
         );
     }
 
@@ -49,7 +52,8 @@ public class ContinentWorldGenerator implements WorldGenerator {
             new DefaultCivilizationGenerator(
                 randomGenerator
             ),
-            new InitialTerritoryGenerator()
+            new InitialTerritoryGenerator(),
+            new DefaultTerritoryProductionCalculator()
         );
     }
 
@@ -57,7 +61,8 @@ public class ContinentWorldGenerator implements WorldGenerator {
         RandomGenerator randomGenerator,
         TileResourcesGenerator tileResourcesGenerator,
         CivilizationGenerator civilizationGenerator,
-        TerritoryGenerator territoryGenerator
+        TerritoryGenerator territoryGenerator,
+        TerritoryProductionCalculator territoryProductionCalculator
     ) {
         this.randomGenerator = Objects.requireNonNull(
             randomGenerator,
@@ -80,6 +85,12 @@ public class ContinentWorldGenerator implements WorldGenerator {
             Objects.requireNonNull(
                 territoryGenerator,
                 "Le générateur de territoires est obligatoire"
+            );
+
+        this.territoryProductionCalculator =
+            Objects.requireNonNull(
+                territoryProductionCalculator,
+                "Le calculateur de productions est obligatoire"
             );
     }
 
@@ -163,12 +174,26 @@ public class ContinentWorldGenerator implements WorldGenerator {
                 INITIAL_TERRITORY_DISTANCE
             );
 
-        return new World(
+        World territorialWorld = new World(
             width,
             height,
             tiles,
             civilizations,
             territories
+        );
+
+        List<TerritoryProduction> productions =
+            territoryProductionCalculator.calculate(
+                territorialWorld
+            );
+
+        return new World(
+            width,
+            height,
+            tiles,
+            civilizations,
+            territories,
+            productions
         );
     }
 
