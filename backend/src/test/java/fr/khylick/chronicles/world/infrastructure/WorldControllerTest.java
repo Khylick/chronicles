@@ -22,16 +22,18 @@ class WorldControllerTest {
     void shouldGenerateWorldWithRequestedDimensions() throws Exception {
         mockMvc.perform(
             get("/api/world")
-                .param("width", "3")
-                .param("height", "2")
+                .param("width", "80")
+                .param("height", "48")
         )
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.width").value(3))
-        .andExpect(jsonPath("$.height").value(2))
-        .andExpect(jsonPath("$.tiles", hasSize(6)))
+        .andExpect(jsonPath("$.width").value(80))
+        .andExpect(jsonPath("$.height").value(48))
+        .andExpect(jsonPath("$.tiles", hasSize(3840)))
         .andExpect(jsonPath("$.tiles[0].position.x").value(0))
         .andExpect(jsonPath("$.tiles[0].position.y").value(0))
-        .andExpect(jsonPath("$.tiles[0].terrainType").isString());
+        .andExpect(jsonPath("$.tiles[0].terrainType").isString())
+        .andExpect(jsonPath("$.territories").isArray())
+        .andExpect(jsonPath("$.territories", hasSize(4)));
     }
 
     @Test
@@ -40,7 +42,9 @@ class WorldControllerTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.width").value(50))
         .andExpect(jsonPath("$.height").value(30))
-        .andExpect(jsonPath("$.tiles", hasSize(1500)));
+        .andExpect(jsonPath("$.tiles", hasSize(1500)))
+        .andExpect(jsonPath("$.civilizations").isArray())
+        .andExpect(jsonPath("$.territories").isArray());
     }
 
     @Test

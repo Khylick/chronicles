@@ -91,7 +91,14 @@ function App() {
             <h3>Civilisations</h3>
 
             <ul>
-              {world.civilizations.map((civilization) => (
+              {world.civilizations.map((civilization) => {
+                const territory = world.territories.find(
+                  (candidate) =>
+                    candidate.civilizationId
+                      === civilization.id
+                );
+
+                return (
                   <li key={civilization.id}>
                     <span
                       className="civilization-color"
@@ -102,17 +109,15 @@ function App() {
 
                     <span>
                       <strong>{civilization.name}</strong>
-                      {" - "}
+                      {" — "}
                       {civilization.capital.name}
-                      {" "}
-                      (
-                      {civilization.capital.position.x},
-                      {" "}
-                      {civilization.capital.position.y}
-                      )
+                      {" — "}
+                      {territory?.positions.length ?? 0}
+                      {" cases"}
                     </span>
                   </li>
-              ))}
+                )
+              })}
             </ul>
           </section>
 

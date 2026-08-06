@@ -2,7 +2,7 @@ import type { CSSProperties } from "react";
 
 import { TERRAIN_VISUALS } from "../config/terrain";
 import { RESOURCE_LABELS } from "../config/resources";
-import type { World } from "../types/world";
+import type {Civilization, World} from "../types/world";
 
 interface WorldMapProps {
     world: World;
@@ -19,6 +19,36 @@ export function WorldMap({ world }: WorldMapProps) {
            civilization
         ]),
     );
+
+    const civilizationById = new Map(
+        world.civilizations.map((civilization) => [
+            civilization.id,
+            civilization
+        ]),
+    );
+
+    const territoryByPosition = new Map<
+        string,
+        Civilization
+    >();
+
+    world.territories.forEach((territory) => {
+        const civilization =
+            civilizationById.get(
+                territory.civilizationId
+            );
+
+        if (!civilization) {
+            return;
+        }
+
+        territory.positions.forEach((position) => {
+            territoryByPosition.set(
+                `${position.x}-${position.y}`,
+                civilization,
+            );
+        });
+    });
 
     return (
         <div
@@ -48,13 +78,27 @@ export function WorldMap({ world }: WorldMapProps) {
                 const civilization =
                     civilizationsByPosition.get(positionKey);
 
+                const territoryCivilization =
+                    territoryByPosition.get(positionKey);
+
                 return (
                     <div
                         key={positionKey}
-                        className="world-tile"
-                        style={{
-                            backgroundColor: terrainVisual.color,
-                        }}
+                        className={[
+                            "world-tile",
+                            territoryCivilization
+                                ? "world-tile--claimed"
+                                : "",
+                        ]
+                            .filter(Boolean)
+                            .join(" ")}
+                        style={
+                            {
+                                backgroundColor: terrainVisual.color,
+                                "--territory-color":
+                                territoryCivilization?.color,
+                            } as CSSProperties
+                        }
                         role="gridcell"
                         title={[
                             `${terrainVisual.label} — (${tile.position.x}, ${tile.position.y})`,

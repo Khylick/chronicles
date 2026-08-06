@@ -22,6 +22,7 @@ export interface World {
     height: number;
     tiles: Tile[];
     civilizations: Civilization[];
+    territories: Territory[];
 }
 
 export type ResourceType =
@@ -45,4 +46,9 @@ export interface Civilization {
     name: string;
     color: string;
     capital: Capital;
+}
+
+export interface Territory {
+    civilizationId: string;
+    positions: Position[];
 }

@@ -9,12 +9,14 @@ public class World {
     private final int height;
     private final List<Tile> tiles;
     private final List<Civilization> civilizations;
+    private final List<Territory> territories;
 
     public World(
         int width,
         int height,
         List<Tile> tiles,
-        List<Civilization> civilizations
+        List<Civilization> civilizations,
+        List<Territory> territories
     ) {
         if (width <= 0) {
             throw new IllegalArgumentException(
@@ -38,6 +40,11 @@ public class World {
             "La liste des civilisations est obligatoire"
         );
 
+        Objects.requireNonNull(
+            territories,
+            "La liste des territoires est obligatoire"
+        );
+
         int expectedTileCount = width * height;
 
         if (tiles.size() != expectedTileCount) {
@@ -53,6 +60,7 @@ public class World {
         this.height = height;
         this.tiles = List.copyOf(tiles);
         this.civilizations = List.copyOf(civilizations);
+        this.territories = List.copyOf(territories);
     }
 
     public World(
@@ -60,7 +68,28 @@ public class World {
         int height,
         List<Tile> tiles
     ) {
-        this(width, height, tiles, List.of());
+        this(
+            width,
+            height,
+            tiles,
+            List.of(),
+            List.of()
+        );
+    }
+
+    public World(
+        int width,
+        int height,
+        List<Tile> tiles,
+        List<Civilization> civilizations
+    ) {
+        this(
+            width,
+            height,
+            tiles,
+            civilizations,
+            List.of()
+        );
     }
 
     public int getWidth() {
@@ -88,6 +117,10 @@ public class World {
 
     public List<Civilization> getCivilizations() {
         return civilizations;
+    }
+
+    public List<Territory> getTerritories() {
+        return territories;
     }
 
     private static void validateTilePosition(

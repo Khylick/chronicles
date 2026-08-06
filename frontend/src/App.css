@@ -189,6 +189,7 @@ input {
 }
 
 .world-tile {
+  --territory-color: transparent;
   position: relative;
 }
 
@@ -230,6 +231,31 @@ input {
   height: 16px;
   border: 1px solid rgb(255 255 255 / 40%);
   border-radius: 50%;
+}
+
+.world-tile--claimed::after {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  background:
+    color-mix(
+      in srgb,
+      var(--territory-color) 25%,
+      transparent
+    );
+  box-shadow:
+    inset 0 0 0 1px
+    color-mix(
+      in srgb,
+      var(--territory-color) 75%,
+      transparent
+    );
+}
+
+.capital-marker {
+  z-index: 2;
 }
 
 @media (max-width: 750px) {

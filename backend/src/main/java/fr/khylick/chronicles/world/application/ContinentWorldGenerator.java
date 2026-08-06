@@ -24,16 +24,19 @@ public class ContinentWorldGenerator implements WorldGenerator {
 
     private static final int DEFAULT_CIVILIZATION_COUNT = 4;
 
+    private static final int INITIAL_TERRITORY_DISTANCE = 4;
+
     private final RandomGenerator randomGenerator;
     private final CivilizationGenerator civilizationGenerator;
-
     private final TileResourcesGenerator tileResourcesGenerator;
+    private final TerritoryGenerator territoryGenerator;
 
     public ContinentWorldGenerator() {
         this(
             new Random(),
             new TerrainTileResourcesGenerator(),
-            new DefaultCivilizationGenerator()
+            new DefaultCivilizationGenerator(),
+            new InitialTerritoryGenerator()
         );
     }
 
@@ -45,14 +48,16 @@ public class ContinentWorldGenerator implements WorldGenerator {
             new TerrainTileResourcesGenerator(),
             new DefaultCivilizationGenerator(
                 randomGenerator
-            )
+            ),
+            new InitialTerritoryGenerator()
         );
     }
 
     public ContinentWorldGenerator(
         RandomGenerator randomGenerator,
         TileResourcesGenerator tileResourcesGenerator,
-        CivilizationGenerator civilizationGenerator
+        CivilizationGenerator civilizationGenerator,
+        TerritoryGenerator territoryGenerator
     ) {
         this.randomGenerator = Objects.requireNonNull(
             randomGenerator,
@@ -69,6 +74,12 @@ public class ContinentWorldGenerator implements WorldGenerator {
             Objects.requireNonNull(
                 civilizationGenerator,
                 "Le générateur de civilisations est obligatoire"
+            );
+
+        this.territoryGenerator =
+            Objects.requireNonNull(
+                territoryGenerator,
+                "Le générateur de territoires est obligatoire"
             );
     }
 
@@ -137,11 +148,27 @@ public class ContinentWorldGenerator implements WorldGenerator {
                 DEFAULT_CIVILIZATION_COUNT
             );
 
+        World inhabitedWorld =
+            new World(
+                width,
+                height,
+                tiles,
+                civilizations
+            );
+
+        List<Territory> territories =
+            territoryGenerator.generate(
+                inhabitedWorld,
+                civilizations,
+                INITIAL_TERRITORY_DISTANCE
+            );
+
         return new World(
             width,
             height,
             tiles,
-            civilizations
+            civilizations,
+            territories
         );
     }
 
