@@ -107,13 +107,36 @@ function App() {
                       }}
                     />
 
-                    <span>
+                    <span className="civilization-detail">
                       <strong>{civilization.name}</strong>
-                      {" — "}
-                      {civilization.capital.name}
-                      {" — "}
-                      {territory?.positions.length ?? 0}
-                      {" cases"}
+
+                      <span>
+                        {civilization.capital.name}
+                        {" — "}
+                        {civilization.capital.population.inhabitants.toLocaleString("fr-FR")}
+                        {" habitants"}
+                        {" | "}
+                      </span>
+
+                      <span className="civilization-statistics">
+                        Croissance potentielle :{" "}
+                        {
+                          (civilization.capital.population.growthRate * 100).toLocaleString("fr-FR", {
+                            maximumFractionDigits: 1,
+                          })
+                        }
+                        {" %"}
+                        {" — "}
+                        Nourriture requise :{" "}
+                        {
+                          civilization.capital.population
+                            .foodConsumptionPerTurn
+                        }
+                        {" / tour"}
+                        {" — "}
+                        {territory?.positions.length ?? 0}
+                        {" cases"}
+                      </span>
                     </span>
                   </li>
                 )

@@ -104,7 +104,11 @@ export function WorldMap({ world }: WorldMapProps) {
                             `${terrainVisual.label} — (${tile.position.x}, ${tile.position.y})`,
                             resourcesLabel,
                             civilization
-                                ? `${civilization.name} — capitale : ${civilization.capital.name}`
+                                ? [
+                                    `${civilization.name} — capitale : ${civilization.capital.name}`,
+                                    `Population : ${civilization.capital.population.inhabitants.toLocaleString("fr-FR")}`,
+                                    `Consommation : ${civilization.capital.population.foodConsumptionPerTurn} nourriture / tour`,
+                                ].join("\n")
                                 : "",
                         ]
                             .filter(Boolean)

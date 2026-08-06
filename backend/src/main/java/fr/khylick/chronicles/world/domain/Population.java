@@ -1,0 +1,43 @@
+package fr.khylick.chronicles.world.domain;
+
+public final class Population {
+
+    private static final int INHABITANTS_PER_FOOD_UNIT = 100;
+
+    private final int inhabitants;
+    private final double growthRate;
+
+    public Population(
+        int inhabitants,
+        double growthRate
+    ) {
+        if (inhabitants <= 0) {
+            throw new IllegalArgumentException(
+                "La population doit être strictement positive"
+            );
+        }
+
+        if (growthRate < 0.0) {
+            throw new IllegalArgumentException(
+                "Le taux de croissance ne peut pas être négatif"
+            );
+        }
+
+        this.inhabitants = inhabitants;
+        this.growthRate = growthRate;
+    }
+
+    public int getInhabitants() {
+        return inhabitants;
+    }
+
+    public double getGrowthRate() {
+        return growthRate;
+    }
+
+    public int getFoodConsumptionPerTurn() {
+        return (int) Math.ceil(
+            inhabitants / (double) INHABITANTS_PER_FOOD_UNIT
+        );
+    }
+}

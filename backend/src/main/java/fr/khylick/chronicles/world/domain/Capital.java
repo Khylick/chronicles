@@ -8,11 +8,13 @@ public final class Capital {
     private final UUID id;
     private final String name;
     private final Position position;
+    private final Population population;
 
     public Capital(
         UUID id,
         String name,
-        Position position
+        Position position,
+        Population population
     ) {
         this.id = Objects.requireNonNull(
             id,
@@ -28,6 +30,11 @@ public final class Capital {
             position,
             "La position de la capitale est obligatoire"
         );
+
+        this.population = Objects.requireNonNull(
+            population,
+            "La population de la capitale est obligatoire"
+        );
     }
 
     public UUID getId() {
@@ -40,6 +47,10 @@ public final class Capital {
 
     public Position getPosition() {
         return position;
+    }
+
+    public Population getPopulation() {
+        return population;
     }
 
     private String requireNonBlank(

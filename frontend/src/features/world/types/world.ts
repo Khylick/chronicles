@@ -39,6 +39,7 @@ export interface Capital {
     id: string;
     name: string;
     position: Position;
+    population: Population;
 }
 
 export interface Civilization {
@@ -51,4 +52,10 @@ export interface Civilization {
 export interface Territory {
     civilizationId: string;
     positions: Position[];
+}
+
+export interface Population {
+    inhabitants: number;
+    growthRate: number;
+    foodConsumptionPerTurn: number;
 }

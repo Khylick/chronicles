@@ -8,13 +8,7 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.random.RandomGenerator;
 
-import fr.khylick.chronicles.world.domain.Capital;
-import fr.khylick.chronicles.world.domain.Civilization;
-import fr.khylick.chronicles.world.domain.Position;
-import fr.khylick.chronicles.world.domain.ResourceType;
-import fr.khylick.chronicles.world.domain.TerrainType;
-import fr.khylick.chronicles.world.domain.Tile;
-import fr.khylick.chronicles.world.domain.World;
+import fr.khylick.chronicles.world.domain.*;
 
 public class DefaultCivilizationGenerator
     implements CivilizationGenerator {
@@ -126,10 +120,14 @@ public class DefaultCivilizationGenerator
             String color =
                 COLORS.get(index % COLORS.size());
 
+            Population population =
+                generateInitialPopulation(candidate);
+
             Capital capital = new Capital(
                 UUID.randomUUID(),
                 capitalName,
-                position
+                position,
+                population
             );
 
             civilizations.add(
@@ -183,5 +181,28 @@ public class DefaultCivilizationGenerator
     ) {
         return Math.abs(first.x() - second.x())
             + Math.abs(first.y() - second.y());
+    }
+
+    private Population generateInitialPopulation(
+        Tile capitalTile
+    ) {
+        int foodPotential = capitalTile
+            .getResources()
+            .get(ResourceType.FOOD);
+
+        int basePopulation = 700;
+        int foodBonus = foodPotential * 150;
+        int randomBonus = randomGenerator.nextInt(301);
+
+        int inhabitants =
+            basePopulation + foodBonus + randomBonus;
+
+        double growthRate =
+            0.01 + foodPotential * 0.005;
+
+        return new Population(
+            inhabitants,
+            growthRate
+        );
     }
 }

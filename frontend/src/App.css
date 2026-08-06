@@ -208,6 +208,10 @@ input {
   margin-top: 24px;
 }
 
+.civilization-list ul {
+  gap: 12px;
+}
+
 .civilization-list h3 {
   margin-bottom: 12px;
 }
@@ -231,6 +235,16 @@ input {
   height: 16px;
   border: 1px solid rgb(255 255 255 / 40%);
   border-radius: 50%;
+}
+
+.civilization-details {
+  display: grid;
+  gap: 2px;
+}
+
+.civilization-statistics {
+  color: #aebbc5;
+  font-size: 0.9rem;
 }
 
 .world-tile--claimed::after {

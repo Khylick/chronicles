@@ -66,4 +66,59 @@ class DefaultCivilizationGeneratorTest {
                 )
         ).doesNotHaveDuplicates();
     }
+
+    @Test
+    void shouldGeneratePositivePopulationForEveryCapital() {
+        World world =
+            new ContinentWorldGenerator(new Random(42))
+                .generate(80, 48);
+
+        assertThat(world.getCivilizations())
+            .allSatisfy(civilization -> {
+                var population =
+                    civilization
+                        .getCapital()
+                        .getPopulation();
+
+                assertThat(population.getInhabitants())
+                    .isPositive();
+
+                assertThat(population.getGrowthRate())
+                    .isPositive();
+
+                assertThat(
+                    population.getFoodConsumptionPerTurn()
+                ).isPositive();
+            });
+    }
+
+    @Test
+    void shouldGenerateSamePopulationWithSameSeed() {
+        World firstWorld =
+            new ContinentWorldGenerator(new Random(42))
+                .generate(80, 48);
+
+        World secondWorld =
+            new ContinentWorldGenerator(new Random(42))
+                .generate(80, 48);
+
+        assertThat(firstWorld.getCivilizations())
+            .extracting(civilization ->
+                civilization
+                    .getCapital()
+                    .getPopulation()
+                    .getInhabitants()
+            )
+            .containsExactlyElementsOf(
+                secondWorld.getCivilizations()
+                    .stream()
+                    .map(civilization ->
+                        civilization
+                            .getCapital()
+                            .getPopulation()
+                            .getInhabitants()
+                    )
+                    .toList()
+            );
+    }
 }
