@@ -1,6 +1,7 @@
 import "./App.css";
 
 import { useWorld } from "./features/world/hooks/useWorld";
+import { useSimulation } from "./features/world/hooks/useSimulation";
 
 import { TerrainLegend } from "./features/world/components/TerrainLegend";
 import { WorldMap } from "./features/world/components/WorldMap";
@@ -21,6 +22,12 @@ function App() {
     height: WORLD_HEIGHT,
   });
 
+  const {
+    simulation,
+    error: simulationError,
+    advanceTurn,
+  } = useSimulation(world);
+
   return (
     <main className="application">
       <header className="application-header">
@@ -29,16 +36,23 @@ function App() {
           <p>Simulateur de civilisation</p>
         </div>
 
-        <button
-            type="button"
-            onClick={() => void regenerate()}
-            disabled={isLoading}
-        >
-          {isLoading
-              ? "Génération..."
-              : "Générer un nouveau monde"
-          }
-        </button>
+        <div className="application-actions">
+          <button
+              type="button"
+              onClick={() => void regenerate()}
+              disabled={isLoading}
+          >
+            Générer un nouveau monde
+          </button>
+
+          <button
+              type="button"
+              onClick={() => void advanceTurn()}
+              disabled={!simulation}
+          >
+            Passer un tour
+          </button>
+        </div>
       </header>
 
       {error && (
@@ -46,6 +60,13 @@ function App() {
           <strong>Impossible de générer le monde</strong>
           <p>{error}</p>
         </section>
+      )}
+
+      {simulationError && (
+          <section className="message message-error">
+            <strong>Impossible de créer la simulation</strong>
+            <p>{simulationError}</p>
+          </section>
       )}
 
       {isLoading && !world && (
@@ -79,6 +100,11 @@ function App() {
               <div>
                 <dt>Cases</dt>
                 <dd>{world.tiles.length}</dd>
+              </div>
+
+              <div>
+                <dt>Tour</dt>
+                <dd>{simulation?.turn ?? "-"}</dd>
               </div>
             </dl>
           </div>

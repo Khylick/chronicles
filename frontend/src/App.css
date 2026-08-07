@@ -50,6 +50,11 @@ input {
   color: #aebbc5;
 }
 
+.application-actions {
+  display: flex;
+  gap: 12px;
+}
+
 .application-header button {
   padding: 12px 18px;
   border: 0;

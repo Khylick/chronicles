@@ -65,4 +65,15 @@ public final class Civilization {
 
         return value;
     }
+
+    public Civilization withCapital(
+        Capital newCapital
+    ) {
+        return new Civilization(
+            id,
+            name,
+            color,
+            newCapital
+        );
+    }
 }

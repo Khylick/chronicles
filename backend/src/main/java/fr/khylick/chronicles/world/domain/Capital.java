@@ -65,4 +65,15 @@ public final class Capital {
 
         return value;
     }
+
+    public Capital withPopulation(
+        Population newPopulation
+    ) {
+        return new Capital(
+            id,
+            name,
+            position,
+            newPopulation
+        );
+    }
 }

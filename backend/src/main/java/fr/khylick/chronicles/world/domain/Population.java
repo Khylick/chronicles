@@ -40,4 +40,15 @@ public final class Population {
             inhabitants / (double) INHABITANTS_PER_FOOD_UNIT
         );
     }
+
+    public Population grow() {
+        int newInhabitants = (int) Math.floor(
+            inhabitants * (1.0 + growthRate)
+        );
+
+        return new Population(
+            Math.max(inhabitants + 1, newInhabitants),
+            growthRate
+        );
+    }
 }

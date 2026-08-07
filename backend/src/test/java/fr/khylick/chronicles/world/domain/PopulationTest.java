@@ -60,4 +60,30 @@ class PopulationTest {
                 "ne peut pas être négatif"
             );
     }
+
+    @Test
+    void shouldGrowPopulation() {
+        Population population =
+            new Population(1_000, 0.03);
+
+        Population grownPopulation =
+            population.grow();
+
+        assertThat(grownPopulation.getInhabitants())
+            .isEqualTo(1_030);
+
+        assertThat(grownPopulation.getGrowthRate())
+            .isEqualTo(0.03);
+    }
+
+    @Test
+    void shouldNotMutateOriginalPopulationWhenGrowing() {
+        Population population =
+            new Population(1_000, 0.03);
+
+        population.grow();
+
+        assertThat(population.getInhabitants())
+            .isEqualTo(1_000);
+    }
 }
