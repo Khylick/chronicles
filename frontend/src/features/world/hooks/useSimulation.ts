@@ -1,39 +1,43 @@
-import { useEffect, useState } from "react";
+import {
+    useCallback,
+    useEffect,
+    useState,
+} from "react";
 
-import type { World } from "../types/world";
 import { createSimulation, nextTurn } from "../../simulation/api/simulationApi";
 import type { Simulation } from "../../simulation/types/simulation";
 
+interface UseSimulationOptions {
+    width: number;
+    height: number;
+}
+
 interface UseSimulationResult {
     simulation: Simulation | null;
-    isLoading: boolean;
     error: string | null;
+    generateSimulation: () => Promise<void>;
     advanceTurn: () => Promise<void>;
 }
 
-const SIMULATION_WIDTH: number = 80;
-const SIMULATION_HEIGHT: number = 48;
-
-export function useSimulation(
-    world: World | null,
-): UseSimulationResult {
+export function useSimulation({
+                                  width,
+                                  height,
+                              }: UseSimulationOptions): UseSimulationResult {
     const [simulation, setSimulation] =
         useState<Simulation | null>(null);
-
-    const [isLoading, setIsLoading] =
-        useState(false);
 
     const [error, setError] =
         useState<string | null>(null);
 
+    /*
+     * Chargement automatique de la simulation
+     * lors du montage du composant ou si les
+     * dimensions changent.
+     */
     useEffect(() => {
-        if (!world) {
-            return;
-        }
-
         let cancelled = false;
 
-        createSimulation(SIMULATION_WIDTH, SIMULATION_HEIGHT)
+        createSimulation(width, height)
             .then((newSimulation) => {
                 if (cancelled) {
                     return;
@@ -53,43 +57,68 @@ export function useSimulation(
                         : "Une erreur inconnue est survenue";
 
                 setError(message);
-            })
-            .finally(() => {
-                if (!cancelled) {
-                    setIsLoading(false);
-                }
             });
 
         return () => {
             cancelled = true;
         };
-    }, [world]);
+    }, [width, height]);
 
-    const advanceTurn = async () => {
-        if (!simulation) {
-            return;
-        }
+    /*
+     * Action appelée manuellement par le bouton
+     * "Générer un nouveau monde".
+     */
+    const generateSimulation =
+        useCallback(async () => {
+            try {
+                const newSimulation =
+                    await createSimulation(
+                        width,
+                        height,
+                    );
 
-        try {
-            const updatedSimulation =
-                await nextTurn();
+                setSimulation(newSimulation);
+                setError(null);
+            } catch (requestError: unknown) {
+                const message =
+                    requestError instanceof Error
+                        ? requestError.message
+                        : "Une erreur inconnue est survenue";
 
-            setSimulation(updatedSimulation);
-            setError(null);
-        } catch (requestError: unknown) {
-            const message =
-                requestError instanceof Error
-                    ? requestError.message
-                    : "Une erreur inconnue est survenue";
+                setError(message);
+            }
+        }, [width, height]);
 
-            setError(message);
-        }
-    };
+    /*
+     * Action appelée par le bouton
+     * "Passer un tour".
+     */
+    const advanceTurn =
+        useCallback(async () => {
+            if (!simulation) {
+                return;
+            }
+
+            try {
+                const updatedSimulation =
+                    await nextTurn();
+
+                setSimulation(updatedSimulation);
+                setError(null);
+            } catch (requestError: unknown) {
+                const message =
+                    requestError instanceof Error
+                        ? requestError.message
+                        : "Une erreur inconnue est survenue";
+
+                setError(message);
+            }
+        }, [simulation]);
 
     return {
         simulation,
-        isLoading,
         error,
+        generateSimulation,
         advanceTurn,
     };
 }

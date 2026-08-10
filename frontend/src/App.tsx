@@ -1,184 +1,224 @@
 import "./App.css";
 
-import { useWorld } from "./features/world/hooks/useWorld";
-import { useSimulation } from "./features/world/hooks/useSimulation";
-
 import { TerrainLegend } from "./features/world/components/TerrainLegend";
 import { WorldMap } from "./features/world/components/WorldMap";
 
+import { useSimulation } from "./features/world/hooks/useSimulation";
 import { getProductionQuantity } from "./features/world/utils/resources";
 
-const WORLD_WIDTH = 80
+const WORLD_WIDTH = 80;
 const WORLD_HEIGHT = 48;
 
 function App() {
   const {
-    world,
-    isLoading,
-    error,
-    regenerate,
-  } = useWorld({
+    simulation,
+    error: simulationError,
+    generateSimulation,
+    advanceTurn,
+  } = useSimulation({
     width: WORLD_WIDTH,
     height: WORLD_HEIGHT,
   });
 
-  const {
-    simulation,
-    error: simulationError,
-    advanceTurn,
-  } = useSimulation(world);
+  const world = simulation?.world ?? null;
 
   return (
-    <main className="application">
-      <header className="application-header">
-        <div>
-          <h1>Chronicles</h1>
-          <p>Simulateur de civilisation</p>
-        </div>
-
-        <div className="application-actions">
-          <button
-              type="button"
-              onClick={() => void regenerate()}
-              disabled={isLoading}
-          >
-            Générer un nouveau monde
-          </button>
-
-          <button
-              type="button"
-              onClick={() => void advanceTurn()}
-              disabled={!simulation}
-          >
-            Passer un tour
-          </button>
-        </div>
-      </header>
-
-      {error && (
-        <section className="message message-error">
-          <strong>Impossible de générer le monde</strong>
-          <p>{error}</p>
-        </section>
-      )}
-
-      {simulationError && (
-          <section className="message message-error">
-            <strong>Impossible de créer la simulation</strong>
-            <p>{simulationError}</p>
-          </section>
-      )}
-
-      {isLoading && !world && (
-        <section className="message">
-          <p>Génération du monde en cours...</p>
-        </section>
-      )}
-
-      {world && (
-        <section className="world-panel">
-          <div className="world-panel-header">
-            <div>
-              <h2>Monde généré</h2>
-
-              <p>
-                {world.width} x {world.height} cases
-              </p>
-            </div>
-
-            <dl className="world-statistics">
-              <div>
-                <dt>Largeur</dt>
-                <dd>{world.width}</dd>
-              </div>
-
-              <div>
-                <dt>Hauteur</dt>
-                <dd>{world.height}</dd>
-              </div>
-
-              <div>
-                <dt>Cases</dt>
-                <dd>{world.tiles.length}</dd>
-              </div>
-
-              <div>
-                <dt>Tour</dt>
-                <dd>{simulation?.turn ?? "-"}</dd>
-              </div>
-            </dl>
+      <main className="application">
+        <header className="application-header">
+          <div>
+            <h1>Chronicles</h1>
+            <p>Simulateur de civilisation</p>
           </div>
 
-          <div className="world-map-container">
-            <WorldMap world={world} />
+          <div className="application-actions">
+            <button
+                type="button"
+                onClick={() => void generateSimulation()}
+            >
+              Générer un nouveau monde
+            </button>
+
+            <button
+                type="button"
+                onClick={() => void advanceTurn()}
+                disabled={!simulation}
+            >
+              Passer un tour
+            </button>
           </div>
+        </header>
 
-          <TerrainLegend world={world} />
+        {simulationError && (
+            <section className="message message-error">
+              <strong>
+                Impossible de créer la simulation
+              </strong>
 
-          <section className="civilization-list">
-            <h3>Civilisations</h3>
+              <p>{simulationError}</p>
+            </section>
+        )}
 
-            <ul>
-              {world.civilizations.map((civilization) => {
-                const territory = world.territories.find(
-                  (candidate) =>
-                    candidate.civilizationId
-                      === civilization.id
-                );
+        {!world && !simulationError && (
+            <section className="message">
+              <p>Génération du monde en cours...</p>
+            </section>
+        )}
 
-                const production =
-                    world.territoryProductions.find(
-                        (candidate) =>
-                            candidate.civilizationId === civilization.id
-                    );
+        {world && (
+            <section className="world-panel">
+              <div className="world-panel-header">
+                <div>
+                  <h2>Monde généré</h2>
 
-                const foodProduction = getProductionQuantity(
-                  production,
-                  "FOOD"
-                );
-                const woodProduction = getProductionQuantity(
-                  production,
-                  "WOOD"
-                );
-                const stoneProduction = getProductionQuantity(
-                  production,
-                  "STONE"
-                );
-                const oreProduction = getProductionQuantity(
-                  production,
-                  "ORE"
-                );
+                  <p>
+                    {world.width} x {world.height} cases
+                  </p>
+                </div>
 
-                const foodConsumption =
-                  civilization.capital.population
-                    .foodConsumptionPerTurn;
+                <dl className="world-statistics">
+                  <div>
+                    <dt>Largeur</dt>
+                    <dd>{world.width}</dd>
+                  </div>
 
-                const foodBalance =
-                  foodProduction - foodConsumption;
+                  <div>
+                    <dt>Hauteur</dt>
+                    <dd>{world.height}</dd>
+                  </div>
 
-                return (
-                  <li key={civilization.id}>
+                  <div>
+                    <dt>Cases</dt>
+                    <dd>{world.tiles.length}</dd>
+                  </div>
+
+                  <div>
+                    <dt>Tour</dt>
+                    <dd>{simulation?.turn ?? "-"}</dd>
+                  </div>
+                </dl>
+              </div>
+
+              <div className="world-map-container">
+                <WorldMap world={world} />
+              </div>
+
+              <TerrainLegend world={world} />
+
+              <section className="civilization-list">
+                <h3>Civilisations</h3>
+
+                <ul>
+                  {world.civilizations.map((civilization) => {
+                    const territory =
+                        world.territories.find(
+                            (candidate) =>
+                                candidate.civilizationId
+                                === civilization.id,
+                        );
+
+                    const civilizationState =
+                        simulation?.civilizationStates.find(
+                            (state) =>
+                                state.civilizationId
+                                === civilization.id,
+                        );
+
+                    const currentCivilization =
+                        civilizationState?.civilization
+                        ?? civilization;
+
+                    const production =
+                        world.territoryProductions.find(
+                            (candidate) =>
+                                candidate.civilizationId
+                                === civilization.id,
+                        );
+
+                    const foodProduction =
+                        getProductionQuantity(
+                            production,
+                            "FOOD",
+                        );
+
+                    const woodProduction =
+                        getProductionQuantity(
+                            production,
+                            "WOOD",
+                        );
+
+                    const stoneProduction =
+                        getProductionQuantity(
+                            production,
+                            "STONE",
+                        );
+
+                    const oreProduction =
+                        getProductionQuantity(
+                            production,
+                            "ORE",
+                        );
+
+                    const foodConsumption =
+                        currentCivilization
+                            .capital
+                            .population
+                            .foodConsumptionPerTurn;
+
+                    const foodBalance =
+                        foodProduction - foodConsumption;
+
+                    const stock =
+                        civilizationState?.stock;
+
+                    const foodStock =
+                        stock?.values.FOOD ?? 0;
+
+                    const woodStock =
+                        stock?.values.WOOD ?? 0;
+
+                    const stoneStock =
+                        stock?.values.STONE ?? 0;
+
+                    const oreStock =
+                        stock?.values.ORE ?? 0;
+
+                    return (
+                        <li key={civilization.id}>
                     <span
-                      className="civilization-color"
-                      style={{
-                        backgroundColor: civilization.color,
-                      }}
+                        className="civilization-color"
+                        style={{
+                          backgroundColor:
+                          currentCivilization.color,
+                        }}
                     />
 
-                    <span className="civilization-details">
+                          <span className="civilization-details">
                       <span className="civilization-name">
-                        <strong>{civilization.name}</strong>
+                        <strong>
+                          {currentCivilization.name}
+                        </strong>
+
                         {" — "}
-                        {civilization.capital.name}
+
+                        {
+                          currentCivilization
+                              .capital
+                              .name
+                        }
                       </span>
 
                       <span>
-                        {civilization.capital.population
-                          .inhabitants
-                          .toLocaleString("fr-FR")}
+                        {currentCivilization
+                            .capital
+                            .population
+                            .inhabitants
+                            .toLocaleString("fr-FR")}
+
                         {" habitants"}
                         {" — "}
+
                         {territory?.positions.length ?? 0}
+
                         {" cases"}
                       </span>
 
@@ -194,32 +234,47 @@ function App() {
                         ⛏️ {oreProduction}
                       </span>
 
-                      <span
-                        className={[
-                          "food-balance",
-                          foodBalance >= 0
-                            ? "food-balance--positive"
-                            : "food-balance--negative",
-                        ].join(" ")}
-                      >
-                        Nourriture :
+                      <span className="civilization-statistics">
+                        Stocks :
                         {" "}
-                        {foodProduction}
-                        {" produite — "}
+                        🍞 {foodStock}
+                        {" · "}
+                        🪵 {woodStock}
+                        {" · "}
+                        🪨 {stoneStock}
+                        {" · "}
+                        ⛏️ {oreStock}
+                      </span>
+
+                      <span className="civilization-statistics">
+                        Consommation :
+                        {" "}
                         {foodConsumption}
-                        {" consommée — solde "}
+                        {" nourriture / tour"}
+                      </span>
+
+                      <span
+                          className={[
+                            "food-balance",
+                            foodBalance >= 0
+                                ? "food-balance--positive"
+                                : "food-balance--negative",
+                          ].join(" ")}
+                      >
+                        Solde alimentaire :
+                        {" "}
                         {foodBalance >= 0 ? "+" : ""}
                         {foodBalance}
                       </span>
                     </span>
-                  </li>
-                )
-              })}
-            </ul>
-          </section>
-        </section>
-      )}
-    </main>
+                        </li>
+                    );
+                  })}
+                </ul>
+              </section>
+            </section>
+        )}
+      </main>
   );
 }
 
