@@ -80,25 +80,33 @@ class SimulationControllerTest {
     @Test
     void shouldReturnCivilizationStatesAfterAdvancingTurn() throws Exception {
         mockMvc.perform(
-                        post("/api/simulation")
-                                .param("width", "80")
-                                .param("height", "48")
-                )
-                .andExpect(status().isOk());
+            post("/api/simulation")
+                .param("width", "80")
+                .param("height", "48")
+        )
+        .andExpect(status().isOk());
 
         mockMvc.perform(
-                        post("/api/simulation/next-turn")
-                )
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.turn").value(1))
-                .andExpect(jsonPath("$.civilizationStates").isArray())
-                .andExpect(
-                        jsonPath("$.civilizationStates[0].civilization")
-                                .exists()
-                )
-                .andExpect(
-                        jsonPath("$.civilizationStates[0].stock")
-                                .exists()
-                );
+            post("/api/simulation/next-turn")
+        )
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.turn").value(1))
+        .andExpect(jsonPath("$.civilizationStates").isArray())
+        .andExpect(
+            jsonPath("$.civilizationStates[0].civilizationId")
+                .exists()
+        )
+        .andExpect(
+            jsonPath("$.civilizationStates[0].population")
+                .exists()
+        )
+        .andExpect(
+            jsonPath("$.civilizationStates[0].population.inhabitants")
+                .isNumber()
+        )
+        .andExpect(
+            jsonPath("$.civilizationStates[0].stock")
+                .exists()
+        );
     }
 }

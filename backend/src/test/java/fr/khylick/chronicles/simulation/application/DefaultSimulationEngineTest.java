@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import fr.khylick.chronicles.simulation.domain.Simulation;
 import fr.khylick.chronicles.world.application.ContinentWorldGenerator;
+import fr.khylick.chronicles.world.domain.Civilization;
 import fr.khylick.chronicles.world.domain.ResourceType;
 import fr.khylick.chronicles.world.domain.World;
 import org.junit.jupiter.api.Test;
@@ -92,19 +93,16 @@ class DefaultSimulationEngineTest {
 
             int beforePopulation =
                 beforeState
-                    .getCivilization()
                     .getPopulation()
                     .getInhabitants();
 
             int afterPopulation =
                 afterState
-                    .getCivilization()
                     .getPopulation()
                     .getInhabitants();
 
             int foodConsumption =
                 beforeState
-                    .getCivilization()
                     .getPopulation()
                     .getFoodConsumptionPerTurn();
 
@@ -124,17 +122,28 @@ class DefaultSimulationEngineTest {
                     .orElseThrow()
                     .get(ResourceType.FOOD);
 
+            String civilizationName =
+                world.getCivilizations()
+                    .stream()
+                    .filter(civilization ->
+                        civilization.getId()
+                            .equals(
+                                beforeState.getCivilizationId()
+                            )
+                    )
+                    .map(Civilization::getName)
+                    .findFirst()
+                    .orElseThrow();
+
             assertThat(foodProduction)
                 .as("production FOOD de %s",
-                    beforeState
-                        .getCivilization()
-                        .getName()
-                    )
-                    .isGreaterThanOrEqualTo(0);
+                    civilizationName
+                )
+                .isGreaterThanOrEqualTo(0);
 
             System.out.printf(
                 "%s : production=%d, consommation=%d, population=%d -> %d%n",
-                beforeState.getCivilization().getName(),
+                civilizationName,
                 foodProduction,
                 foodConsumption,
                 beforePopulation,

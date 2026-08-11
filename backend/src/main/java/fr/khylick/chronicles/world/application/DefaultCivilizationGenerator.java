@@ -120,9 +120,6 @@ public class DefaultCivilizationGenerator
             String color =
                 COLORS.get(index % COLORS.size());
 
-            Population population =
-                generateInitialPopulation(candidate);
-
             Capital capital = new Capital(
                 UUID.randomUUID(),
                 capitalName,
@@ -134,8 +131,7 @@ public class DefaultCivilizationGenerator
                     UUID.randomUUID(),
                     civilizationName,
                     color,
-                    capital,
-                    population
+                    capital
                 )
             );
 

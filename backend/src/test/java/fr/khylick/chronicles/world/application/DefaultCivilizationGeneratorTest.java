@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Random;
 
+import fr.khylick.chronicles.simulation.domain.CivilizationState;
 import org.junit.jupiter.api.Test;
 
 import fr.khylick.chronicles.world.domain.TerrainType;
@@ -65,57 +66,5 @@ class DefaultCivilizationGeneratorTest {
                         .getPosition()
                 )
         ).doesNotHaveDuplicates();
-    }
-
-    @Test
-    void shouldGeneratePositivePopulationForEveryCapital() {
-        World world =
-            new ContinentWorldGenerator(new Random(42))
-                .generate(80, 48);
-
-        assertThat(world.getCivilizations())
-            .allSatisfy(civilization -> {
-                var population =
-                    civilization
-                    .getPopulation();
-
-                assertThat(population.getInhabitants())
-                    .isPositive();
-
-                assertThat(population.getGrowthRate())
-                    .isPositive();
-
-                assertThat(
-                    population.getFoodConsumptionPerTurn()
-                ).isPositive();
-            });
-    }
-
-    @Test
-    void shouldGenerateSamePopulationWithSameSeed() {
-        World firstWorld =
-            new ContinentWorldGenerator(new Random(42))
-                .generate(80, 48);
-
-        World secondWorld =
-            new ContinentWorldGenerator(new Random(42))
-                .generate(80, 48);
-
-        assertThat(firstWorld.getCivilizations())
-            .extracting(civilization ->
-                civilization
-                    .getPopulation()
-                    .getInhabitants()
-            )
-            .containsExactlyElementsOf(
-                secondWorld.getCivilizations()
-                    .stream()
-                    .map(civilization ->
-                        civilization
-                            .getPopulation()
-                            .getInhabitants()
-                    )
-                    .toList()
-            );
     }
 }

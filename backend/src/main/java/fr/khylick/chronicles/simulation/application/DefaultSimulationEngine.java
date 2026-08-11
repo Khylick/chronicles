@@ -37,13 +37,11 @@ public final class DefaultSimulationEngine
                     production
                 );
 
-            Civilization civilization =
-                state.getCivilization();
+            Population population =
+                state.getPopulation();
 
             int foodConsumption =
-                civilization
-                    .getPopulation()
-                    .getFoodConsumptionPerTurn();
+                population.getFoodConsumptionPerTurn();
 
             boolean canFeedPopulation =
                 stock.get(ResourceType.FOOD)
@@ -55,13 +53,14 @@ public final class DefaultSimulationEngine
                     foodConsumption
                 );
 
-                civilization =
-                    growPopulation(civilization);
+                population =
+                    population.grow();
             }
 
             newStates.add(
                 new CivilizationState(
-                    civilization,
+                    state.getCivilizationId(),
+                    population,
                     stock
                 )
             );
@@ -115,18 +114,5 @@ public final class DefaultSimulationEngine
         }
 
         return updated;
-    }
-
-    private Civilization growPopulation(
-        Civilization civilization
-    ) {
-        Population population =
-            civilization
-                .getPopulation()
-                .grow();
-
-        return civilization.withPopulation(
-            population
-        );
     }
 }

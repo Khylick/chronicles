@@ -1,5 +1,7 @@
 package fr.khylick.chronicles.world.domain;
 
+import fr.khylick.chronicles.simulation.domain.CivilizationState;
+import fr.khylick.chronicles.simulation.domain.ResourceStock;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -9,41 +11,44 @@ import java.util.UUID;
 class CivilizationTest {
 
     @Test
-    void shouldCreateNewCivilizationWhenPopulationChanges() {
-        Capital capital =
-            new Capital(
-                UUID.randomUUID(),
-                "Aldor",
-                new Position(3, 2)
-            );
+    void shouldKeepCivilizationIdentityWhenPopulationChanges() {
+        UUID civilizationId =
+                UUID.randomUUID();
 
-        Civilization civilization =
-            new Civilization(
-                UUID.randomUUID(),
-                "Aldéens",
-                "#e63946",
-                capital,
-                new Population(1_000, 0.03)
-            );
+        ResourceStock resourceStock = new ResourceStock();
 
-        Civilization updated =
-            civilization.withPopulation(
-                new Population(1_030, 0.03)
-            );
+        Population initialPopulation =
+                new Population(
+                        1_000,
+                        0.03
+                );
+
+        CivilizationState state =
+                new CivilizationState(
+                        civilizationId,
+                        initialPopulation,
+                        resourceStock
+                );
+
+        Population grownPopulation =
+                state.getPopulation().grow();
+
+        CivilizationState updated =
+                new CivilizationState(
+                        state.getCivilizationId(),
+                        grownPopulation,
+                        state.getStock()
+                );
+
+        assertThat(updated.getCivilizationId())
+                .isEqualTo(civilizationId);
 
         assertThat(
-            civilization
-                .getPopulation()
-                .getInhabitants()
-        ).isEqualTo(1_000);
-
-        assertThat(
-            updated
-                .getPopulation()
-                .getInhabitants()
-        ).isEqualTo(1_030);
-
-        assertThat(updated.getCapital())
-            .isSameAs(capital);
+                updated
+                        .getPopulation()
+                        .getInhabitants()
+        ).isGreaterThan(
+                initialPopulation.getInhabitants()
+        );
     }
 }

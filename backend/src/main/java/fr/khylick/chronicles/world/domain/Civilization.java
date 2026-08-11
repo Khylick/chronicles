@@ -9,14 +9,12 @@ public final class Civilization {
     private final String name;
     private final String color;
     private final Capital capital;
-    private final Population population;
 
     public Civilization(
         UUID id,
         String name,
         String color,
-        Capital capital,
-        Population population
+        Capital capital
     ) {
         this.id = Objects.requireNonNull(
             id,
@@ -37,11 +35,6 @@ public final class Civilization {
             capital,
             "La capitale de la civilisation est obligatoire"
         );
-
-        this.population = Objects.requireNonNull(
-            population,
-            "La population de la civilisation est obligatoire"
-        );
     }
 
     public UUID getId() {
@@ -58,22 +51,6 @@ public final class Civilization {
 
     public Capital getCapital() {
         return capital;
-    }
-
-    public Population getPopulation() {
-        return population;
-    }
-
-    public Civilization withPopulation(
-        Population newPopulation
-    ) {
-        return new Civilization(
-            id,
-            name,
-            color,
-            capital,
-            newPopulation
-        );
     }
 
     private static String requireNonBlank(
