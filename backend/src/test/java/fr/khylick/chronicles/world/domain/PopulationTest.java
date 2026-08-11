@@ -86,4 +86,43 @@ class PopulationTest {
         assertThat(population.getInhabitants())
             .isEqualTo(1_000);
     }
+
+    @Test
+    void shouldDeclinePopulation() {
+        Population population =
+            new Population(1_000, 0.03);
+
+        Population declinedPopulation =
+            population.decline(0.10);
+
+        assertThat(
+            declinedPopulation.getInhabitants()
+        ).isEqualTo(900);
+    }
+
+    @Test
+    void shouldNotDeclineBelowOneInhabitant() {
+        Population population =
+            new Population(10, 0.03);
+
+        Population declinedPopulation =
+            population.decline(1.0);
+
+        assertThat(
+            declinedPopulation.getInhabitants()
+        ).isEqualTo(1);
+    }
+
+    @Test
+    void shouldRejectNegativeDeclineRate() {
+        Population population =
+            new Population(1_000, 0.03);
+
+        assertThatThrownBy(
+            () -> population.decline(-0.1)
+        )
+        .isInstanceOf(
+            IllegalArgumentException.class
+        );
+    }
 }

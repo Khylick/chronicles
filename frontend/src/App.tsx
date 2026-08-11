@@ -178,6 +178,9 @@ function App() {
                     const oreStock =
                         stock?.values.ORE ?? 0;
 
+                    const isFoodShortage =
+                        foodStock < foodConsumption;
+
                     return (
                       <li key={civilization.id}>
                         <span
@@ -250,6 +253,12 @@ function App() {
                             {foodBalance >= 0 ? "+" : ""}
                             {foodBalance}
                           </span>
+
+                          {isFoodShortage && (
+                            <span className="food-shortage-warning">
+                              ⚠️ Risque de famine au prochain tour
+                            </span>
+                          )}
                         </span>
                       </li>
                     );

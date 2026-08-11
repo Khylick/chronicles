@@ -6,13 +6,14 @@ import java.util.List;
 import fr.khylick.chronicles.simulation.domain.CivilizationState;
 import fr.khylick.chronicles.simulation.domain.ResourceStock;
 import fr.khylick.chronicles.simulation.domain.Simulation;
-import fr.khylick.chronicles.world.domain.Civilization;
 import fr.khylick.chronicles.world.domain.Population;
 import fr.khylick.chronicles.world.domain.ResourceType;
 import fr.khylick.chronicles.world.domain.TerritoryProduction;
 
 public final class DefaultSimulationEngine
     implements SimulationEngine {
+
+    private static final double MAXIMUM_FAMINE_DECLINE_RATE = 0.10;
 
     @Override
     public Simulation nextTurn(
@@ -43,11 +44,16 @@ public final class DefaultSimulationEngine
             int foodConsumption =
                 population.getFoodConsumptionPerTurn();
 
-            boolean canFeedPopulation =
-                stock.get(ResourceType.FOOD)
-                    >= foodConsumption;
+            int availableFood =
+                stock.get(ResourceType.FOOD);
 
-            if (canFeedPopulation) {
+            int missingFood =
+                Math.max(
+                    0,
+                    foodConsumption - availableFood
+                );
+
+            if (missingFood == 0) {
                 stock = stock.consume(
                     ResourceType.FOOD,
                     foodConsumption
@@ -55,6 +61,20 @@ public final class DefaultSimulationEngine
 
                 population =
                     population.grow();
+            } else {
+                if (availableFood > 0) {
+                    stock = stock.consume(
+                        ResourceType.FOOD,
+                        availableFood
+                    );
+                }
+
+                population =
+                    applyFoodShortage(
+                        population,
+                        foodConsumption,
+                        missingFood
+                    );
             }
 
             newStates.add(
@@ -114,5 +134,21 @@ public final class DefaultSimulationEngine
         }
 
         return updated;
+    }
+
+    private Population applyFoodShortage(
+        Population population,
+        int foodConsumption,
+        int missingFood
+    ) {
+        double shortageRatio =
+            missingFood / (double) foodConsumption;
+
+        double declineRate =
+            shortageRatio * MAXIMUM_FAMINE_DECLINE_RATE;
+
+        return population.decline(
+            declineRate
+        );
     }
 }

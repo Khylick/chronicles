@@ -271,6 +271,12 @@ input {
   color: #ff8f8f;
 }
 
+.food-shortage-warning {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ffb86b;
+}
+
 .world-tile--claimed::after {
   position: absolute;
   z-index: 1;

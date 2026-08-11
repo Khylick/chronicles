@@ -51,4 +51,28 @@ public final class Population {
             growthRate
         );
     }
+
+    public Population decline(
+        double declineRate
+    ) {
+        if (declineRate < 0.0) {
+            throw new IllegalArgumentException(
+                "Le taux de décroissance ne peut pas être négatif"
+            );
+        }
+
+        int lostInhabitants = (int) Math.ceil(
+            inhabitants * declineRate
+        );
+
+        int newInhabitants = Math.max(
+            1,
+            inhabitants - lostInhabitants
+        );
+
+        return new Population(
+            newInhabitants,
+            growthRate
+        );
+    }
 }
