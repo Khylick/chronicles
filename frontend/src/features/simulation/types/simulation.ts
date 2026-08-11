@@ -1,5 +1,5 @@
 import type {
-    Civilization,
+    Population,
     ResourceType,
     World
 } from "../../world/types/world";
@@ -10,7 +10,7 @@ export interface ResourceStock {
 
 export interface CivilizationState {
     civilizationId: string;
-    civilization: Civilization;
+    population: Population;
     stock: ResourceStock;
 }
 

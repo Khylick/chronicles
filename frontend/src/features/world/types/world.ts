@@ -40,7 +40,6 @@ export interface Capital {
     id: string;
     name: string;
     position: Position;
-    population: Population;
 }
 
 export interface Civilization {

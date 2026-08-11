@@ -114,8 +114,6 @@ export function WorldMap({ world }: WorldMapProps) {
                             civilization
                                 ? [
                                     `${civilization.name} — capitale : ${civilization.capital.name}`,
-                                    `Population : ${civilization.capital.population.inhabitants.toLocaleString("fr-FR")}`,
-                                    `Consommation : ${civilization.capital.population.foodConsumptionPerTurn} nourriture / tour`,
                                 ].join("\n")
                                 : "",
                             territoryProduction

@@ -123,9 +123,8 @@ function App() {
                                 === civilization.id,
                         );
 
-                    const currentCivilization =
-                        civilizationState?.civilization
-                        ?? civilization;
+                    const population =
+                        civilizationState?.population;
 
                     const production =
                         world.territoryProductions.find(
@@ -159,10 +158,7 @@ function App() {
                         );
 
                     const foodConsumption =
-                        currentCivilization
-                            .capital
-                            .population
-                            .foodConsumptionPerTurn;
+                        population?.foodConsumptionPerTurn ?? 0;
 
                     const foodBalance =
                         foodProduction - foodConsumption;
@@ -183,91 +179,79 @@ function App() {
                         stock?.values.ORE ?? 0;
 
                     return (
-                        <li key={civilization.id}>
-                    <span
-                        className="civilization-color"
-                        style={{
-                          backgroundColor:
-                          currentCivilization.color,
-                        }}
-                    />
+                      <li key={civilization.id}>
+                        <span
+                          className="civilization-color"
+                          style={{
+                            backgroundColor:
+                            civilization.color,
+                          }}
+                        />
 
-                          <span className="civilization-details">
-                      <span className="civilization-name">
-                        <strong>
-                          {currentCivilization.name}
-                        </strong>
+                        <span className="civilization-details">
+                          <span className="civilization-name">
+                            <strong>
+                              {civilization.name}
+                            </strong>
+                            {" — "}
+                            {civilization.capital.name}
+                          </span>
 
-                        {" — "}
+                          <span>
+                            {(population?.inhabitants ?? 0)
+                              .toLocaleString("fr-FR")}
+                            {" habitants"}
+                            {" — "}
+                            {territory?.positions.length ?? 0}
+                            {" cases"}
+                          </span>
 
-                        {
-                          currentCivilization
-                              .capital
-                              .name
-                        }
-                      </span>
+                          <span className="civilization-statistics">
+                            Production :
+                            {" "}
+                            🍞 {foodProduction}
+                            {" · "}
+                            🪵 {woodProduction}
+                            {" · "}
+                            🪨 {stoneProduction}
+                            {" · "}
+                            ⛏️ {oreProduction}
+                          </span>
 
-                      <span>
-                        {currentCivilization
-                            .capital
-                            .population
-                            .inhabitants
-                            .toLocaleString("fr-FR")}
+                          <span className="civilization-statistics">
+                            Stocks :
+                            {" "}
+                            🍞 {foodStock}
+                            {" · "}
+                            🪵 {woodStock}
+                            {" · "}
+                            🪨 {stoneStock}
+                            {" · "}
+                            ⛏️ {oreStock}
+                          </span>
 
-                        {" habitants"}
-                        {" — "}
+                          <span className="civilization-statistics">
+                            Consommation :
+                            {" "}
+                            {foodConsumption}
+                            {" nourriture / tour"}
+                          </span>
 
-                        {territory?.positions.length ?? 0}
-
-                        {" cases"}
-                      </span>
-
-                      <span className="civilization-statistics">
-                        Production :
-                        {" "}
-                        🍞 {foodProduction}
-                        {" · "}
-                        🪵 {woodProduction}
-                        {" · "}
-                        🪨 {stoneProduction}
-                        {" · "}
-                        ⛏️ {oreProduction}
-                      </span>
-
-                      <span className="civilization-statistics">
-                        Stocks :
-                        {" "}
-                        🍞 {foodStock}
-                        {" · "}
-                        🪵 {woodStock}
-                        {" · "}
-                        🪨 {stoneStock}
-                        {" · "}
-                        ⛏️ {oreStock}
-                      </span>
-
-                      <span className="civilization-statistics">
-                        Consommation :
-                        {" "}
-                        {foodConsumption}
-                        {" nourriture / tour"}
-                      </span>
-
-                      <span
-                          className={[
-                            "food-balance",
-                            foodBalance >= 0
+                          <span
+                            className={[
+                              "food-balance",
+                              foodBalance >= 0
                                 ? "food-balance--positive"
                                 : "food-balance--negative",
-                          ].join(" ")}
-                      >
-                        Solde alimentaire :
-                        {" "}
-                        {foodBalance >= 0 ? "+" : ""}
-                        {foodBalance}
-                      </span>
-                    </span>
-                        </li>
+                            ].join(" ")}
+                          >
+                            Solde alimentaire :
+                            {" "}
+                            {foodBalance >= 0 ? "+" : ""}
+                            {foodBalance}
+                          </span>
+                        </span>
+                      </li>
                     );
                   })}
                 </ul>
