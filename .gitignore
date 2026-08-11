@@ -1,0 +1,31 @@
+# Root .gitignore
+
+# System
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Java / Maven
+/backend/target/
+**/target/
+*.class
+*.jar
+
+# IDEs
+/.idea/
+*.iml
+
+# Node
+/frontend/node_modules/
+/frontend/dist/
+
+# Logs
+npm-debug.log*
+*.log
+
+# Others
+.vscode/
