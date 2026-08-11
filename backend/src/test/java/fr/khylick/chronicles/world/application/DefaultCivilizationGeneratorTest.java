@@ -77,8 +77,7 @@ class DefaultCivilizationGeneratorTest {
             .allSatisfy(civilization -> {
                 var population =
                     civilization
-                        .getCapital()
-                        .getPopulation();
+                    .getPopulation();
 
                 assertThat(population.getInhabitants())
                     .isPositive();
@@ -105,7 +104,6 @@ class DefaultCivilizationGeneratorTest {
         assertThat(firstWorld.getCivilizations())
             .extracting(civilization ->
                 civilization
-                    .getCapital()
                     .getPopulation()
                     .getInhabitants()
             )
@@ -114,7 +112,6 @@ class DefaultCivilizationGeneratorTest {
                     .stream()
                     .map(civilization ->
                         civilization
-                            .getCapital()
                             .getPopulation()
                             .getInhabitants()
                     )

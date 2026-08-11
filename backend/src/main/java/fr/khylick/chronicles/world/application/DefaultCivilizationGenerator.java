@@ -126,8 +126,7 @@ public class DefaultCivilizationGenerator
             Capital capital = new Capital(
                 UUID.randomUUID(),
                 capitalName,
-                position,
-                population
+                position
             );
 
             civilizations.add(
@@ -135,7 +134,8 @@ public class DefaultCivilizationGenerator
                     UUID.randomUUID(),
                     civilizationName,
                     color,
-                    capital
+                    capital,
+                    population
                 )
             );
 

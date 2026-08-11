@@ -7,6 +7,7 @@ import fr.khylick.chronicles.simulation.domain.CivilizationState;
 import fr.khylick.chronicles.simulation.domain.ResourceStock;
 import fr.khylick.chronicles.simulation.domain.Simulation;
 import fr.khylick.chronicles.world.domain.Civilization;
+import fr.khylick.chronicles.world.domain.Population;
 import fr.khylick.chronicles.world.domain.ResourceType;
 import fr.khylick.chronicles.world.domain.TerritoryProduction;
 
@@ -41,7 +42,6 @@ public final class DefaultSimulationEngine
 
             int foodConsumption =
                 civilization
-                    .getCapital()
                     .getPopulation()
                     .getFoodConsumptionPerTurn();
 
@@ -120,17 +120,13 @@ public final class DefaultSimulationEngine
     private Civilization growPopulation(
         Civilization civilization
     ) {
-        var capital =
-            civilization.getCapital();
+        Population population =
+            civilization
+                .getPopulation()
+                .grow();
 
-        var population =
-            capital.getPopulation().grow();
-
-        var updatedCapital =
-            capital.withPopulation(population);
-
-        return civilization.withCapital(
-            updatedCapital
+        return civilization.withPopulation(
+            population
         );
     }
 }

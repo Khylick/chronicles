@@ -93,21 +93,18 @@ class DefaultSimulationEngineTest {
             int beforePopulation =
                 beforeState
                     .getCivilization()
-                    .getCapital()
                     .getPopulation()
                     .getInhabitants();
 
             int afterPopulation =
                 afterState
                     .getCivilization()
-                    .getCapital()
                     .getPopulation()
                     .getInhabitants();
 
             int foodConsumption =
                 beforeState
                     .getCivilization()
-                    .getCapital()
                     .getPopulation()
                     .getFoodConsumptionPerTurn();
 
