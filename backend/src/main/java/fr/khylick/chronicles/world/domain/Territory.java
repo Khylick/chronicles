@@ -1,5 +1,6 @@
 package fr.khylick.chronicles.world.domain;
 
+import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -42,5 +43,24 @@ public class Territory {
 
     public boolean contains(Position position) {
         return positions.contains(position);
+    }
+
+    public Territory withAdditionalPosition(
+        Position position
+    ) {
+        Objects.requireNonNull(
+            position,
+            "La position est obligatoire"
+        );
+
+        Set<Position> updatePositions =
+            new LinkedHashSet<>(positions);
+
+        updatePositions.add(position);
+
+        return new Territory(
+            civilizationId,
+            updatePositions
+        );
     }
 }

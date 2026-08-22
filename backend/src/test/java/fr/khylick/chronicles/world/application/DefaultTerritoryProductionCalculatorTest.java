@@ -65,7 +65,7 @@ class DefaultTerritoryProductionCalculatorTest {
             List.of(territory)
         );
 
-        var productions = calculator.calculate(world);
+        var productions = calculator.calculate(world, List.of(territory));
 
         assertThat(productions).hasSize(1);
 

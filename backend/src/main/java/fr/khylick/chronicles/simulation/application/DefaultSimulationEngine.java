@@ -6,8 +6,10 @@ import java.util.List;
 import fr.khylick.chronicles.simulation.domain.CivilizationState;
 import fr.khylick.chronicles.simulation.domain.ResourceStock;
 import fr.khylick.chronicles.simulation.domain.Simulation;
+import fr.khylick.chronicles.world.application.TerritoryProductionCalculator;
 import fr.khylick.chronicles.world.domain.Population;
 import fr.khylick.chronicles.world.domain.ResourceType;
+import fr.khylick.chronicles.world.domain.Territory;
 import fr.khylick.chronicles.world.domain.TerritoryProduction;
 
 public final class DefaultSimulationEngine
@@ -15,10 +17,34 @@ public final class DefaultSimulationEngine
 
     private static final double MAXIMUM_FAMINE_DECLINE_RATE = 0.10;
 
+    private final TerritoryProductionCalculator
+        territoryProductionCalculator;
+
+    private final TerritoryExpansionService
+        territoryExpansionService;
+
+    public DefaultSimulationEngine(
+        TerritoryProductionCalculator
+            territoryProductionCalculator,
+        TerritoryExpansionService
+            territoryExpansionService
+    ) {
+        this.territoryProductionCalculator =
+            territoryProductionCalculator;
+        this.territoryExpansionService =
+            territoryExpansionService;
+    }
+
     @Override
     public Simulation nextTurn(
         Simulation simulation
     ) {
+        List<TerritoryProduction> productions =
+            territoryProductionCalculator.calculate(
+                simulation.getWorld(),
+                simulation.getTerritories()
+            );
+
         List<CivilizationState> newStates =
             new ArrayList<>();
 
@@ -28,7 +54,7 @@ public final class DefaultSimulationEngine
         ) {
             TerritoryProduction production =
                 findProduction(
-                    simulation,
+                    productions,
                     state
                 );
 
@@ -86,20 +112,26 @@ public final class DefaultSimulationEngine
             );
         }
 
+        List<Territory> territories =
+            territoryExpansionService.expand(
+                simulation.getWorld(),
+                simulation.getTerritories(),
+                newStates
+            );
+
         return new Simulation(
             simulation.getTurn() + 1,
             simulation.getWorld(),
-            newStates
+            newStates,
+            territories
         );
     }
 
     private TerritoryProduction findProduction(
-        Simulation simulation,
+        List<TerritoryProduction> productions,
         CivilizationState state
     ) {
-        return simulation
-            .getWorld()
-            .getTerritoryProductions()
+        return productions
             .stream()
             .filter(production ->
                 production
@@ -116,6 +148,7 @@ public final class DefaultSimulationEngine
                 )
             );
     }
+
 
     private ResourceStock addProduction(
         ResourceStock stock,

@@ -33,7 +33,8 @@ public final class DefaultSimulationFactory
         return new Simulation(
             0,
             world,
-            states
+            states,
+            world.getTerritories()
         );
     }
 

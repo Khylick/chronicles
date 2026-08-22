@@ -1,19 +1,35 @@
 package fr.khylick.chronicles.simulation.infrastructure;
 
+import fr.khylick.chronicles.simulation.application.*;
+import fr.khylick.chronicles.world.application.DefaultTerritoryProductionCalculator;
+import fr.khylick.chronicles.world.application.TerritoryProductionCalculator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import fr.khylick.chronicles.simulation.application.DefaultSimulationEngine;
-import fr.khylick.chronicles.simulation.application.DefaultSimulationFactory;
-import fr.khylick.chronicles.simulation.application.SimulationEngine;
-import fr.khylick.chronicles.simulation.application.SimulationFactory;
 
 @Configuration
 public class SimulationConfiguration {
 
     @Bean
-    SimulationEngine simulationEngine() {
-        return new DefaultSimulationEngine();
+    TerritoryExpansionService territoryExpansionService() {
+        return new DefaultTerritoryExpansionService();
+    }
+
+    @Bean
+    TerritoryProductionCalculator territoryProductionCalculator() {
+        return new DefaultTerritoryProductionCalculator();
+    }
+
+    @Bean
+    SimulationEngine simulationEngine(
+        TerritoryProductionCalculator
+            territoryProductionCalculator,
+        TerritoryExpansionService
+            territoryExpansionService
+    ) {
+        return new DefaultSimulationEngine(
+            territoryProductionCalculator,
+            territoryExpansionService
+        );
     }
 
     @Bean

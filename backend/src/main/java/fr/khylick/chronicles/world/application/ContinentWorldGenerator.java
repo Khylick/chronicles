@@ -184,7 +184,8 @@ public class ContinentWorldGenerator implements WorldGenerator {
 
         List<TerritoryProduction> productions =
             territoryProductionCalculator.calculate(
-                territorialWorld
+                territorialWorld,
+                territories
             );
 
         return new World(

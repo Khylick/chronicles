@@ -99,7 +99,10 @@ function App() {
               </div>
 
               <div className="world-map-container">
-                <WorldMap world={world} />
+                <WorldMap
+                    world={world}
+                    territories={simulation?.territories ?? []}
+                />
               </div>
 
               <TerrainLegend world={world} />
@@ -110,7 +113,7 @@ function App() {
                 <ul>
                   {world.civilizations.map((civilization) => {
                     const territory =
-                        world.territories.find(
+                        simulation?.territories.find(
                             (candidate) =>
                                 candidate.civilizationId
                                 === civilization.id,

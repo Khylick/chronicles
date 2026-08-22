@@ -3,6 +3,7 @@ package fr.khylick.chronicles.simulation.domain;
 import java.util.List;
 import java.util.Objects;
 
+import fr.khylick.chronicles.world.domain.Territory;
 import fr.khylick.chronicles.world.domain.World;
 
 public final class Simulation {
@@ -10,11 +11,13 @@ public final class Simulation {
     private final int turn;
     private final World world;
     private final List<CivilizationState> civilizationStates;
+    private final List<Territory> territories;
 
     public Simulation(
         int turn,
         World world,
-        List<CivilizationState> civilizationStates
+        List<CivilizationState> civilizationStates,
+        List<Territory> territories
     ) {
         if (turn < 0) {
             throw new IllegalArgumentException(
@@ -33,6 +36,14 @@ public final class Simulation {
                     civilizationStates
                 )
             );
+
+        this.territories =
+            List.copyOf(
+                Objects.requireNonNull(
+                    territories,
+                    "Les territoires sont obligatoires"
+                )
+            );
     }
 
     public int getTurn() {
@@ -45,5 +56,9 @@ public final class Simulation {
 
     public List<CivilizationState> getCivilizationStates() {
         return civilizationStates;
+    }
+
+    public List<Territory> getTerritories() {
+        return territories;
     }
 }

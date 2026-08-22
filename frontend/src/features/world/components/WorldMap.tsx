@@ -2,13 +2,14 @@ import type { CSSProperties } from "react";
 
 import { TERRAIN_VISUALS } from "../config/terrain";
 import { RESOURCE_LABELS } from "../config/resources";
-import type {Civilization, World} from "../types/world";
+import type {Civilization, Territory, World} from "../types/world";
 
 interface WorldMapProps {
     world: World;
+    territories: Territory[];
 }
 
-export function WorldMap({ world }: WorldMapProps) {
+export function WorldMap({ world, territories }: WorldMapProps) {
     const gridStyle: CSSProperties = {
         gridTemplateColumns: `repeat(${world.width}, minmax(0, 1fr))`,
     };
@@ -32,7 +33,7 @@ export function WorldMap({ world }: WorldMapProps) {
         Civilization
     >();
 
-    world.territories.forEach((territory) => {
+    territories.forEach((territory) => {
         const civilization =
             civilizationById.get(
                 territory.civilizationId

@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import fr.khylick.chronicles.simulation.domain.Simulation;
 import fr.khylick.chronicles.world.application.ContinentWorldGenerator;
+import fr.khylick.chronicles.world.application.DefaultTerritoryProductionCalculator;
+import fr.khylick.chronicles.world.application.TerritoryProductionCalculator;
 import fr.khylick.chronicles.world.domain.Civilization;
 import fr.khylick.chronicles.world.domain.ResourceType;
 import fr.khylick.chronicles.world.domain.World;
@@ -24,8 +26,17 @@ class DefaultSimulationEngineTest {
             new DefaultSimulationFactory()
                 .create(world);
 
+        TerritoryProductionCalculator productionCalculator =
+            new DefaultTerritoryProductionCalculator();
+
+        TerritoryExpansionService expansionService =
+            new DefaultTerritoryExpansionService();
+
         Simulation next =
-            new DefaultSimulationEngine()
+            new DefaultSimulationEngine(
+                productionCalculator,
+                expansionService
+            )
                 .nextTurn(simulation);
 
         assertThat(simulation.getTurn())
@@ -46,9 +57,18 @@ class DefaultSimulationEngineTest {
             new DefaultSimulationFactory()
                 .create(world);
 
+        TerritoryProductionCalculator productionCalculator =
+                new DefaultTerritoryProductionCalculator();
+
+        TerritoryExpansionService expansionService =
+                new DefaultTerritoryExpansionService();
+
         Simulation next =
-            new DefaultSimulationEngine()
-                .nextTurn(simulation);
+            new DefaultSimulationEngine(
+                productionCalculator,
+                expansionService
+            )
+            .nextTurn(simulation);
 
         assertThat(next.getCivilizationStates())
             .allSatisfy(state ->
@@ -70,9 +90,18 @@ class DefaultSimulationEngineTest {
             new DefaultSimulationFactory()
                 .create(world);
 
+        TerritoryProductionCalculator productionCalculator =
+                new DefaultTerritoryProductionCalculator();
+
+        TerritoryExpansionService expansionService =
+                new DefaultTerritoryExpansionService();
+
         Simulation next =
-            new DefaultSimulationEngine()
-                .nextTurn(simulation);
+            new DefaultSimulationEngine(
+                productionCalculator,
+                expansionService
+            )
+            .nextTurn(simulation);
 
         for (
             int index = 0;
@@ -171,13 +200,25 @@ class DefaultSimulationEngineTest {
             new DefaultSimulationFactory()
                 .create(world);
 
+        TerritoryProductionCalculator productionCalculator =
+                new DefaultTerritoryProductionCalculator();
+
+        TerritoryExpansionService expansionService =
+                new DefaultTerritoryExpansionService();
+
         Simulation turn1 =
-            new DefaultSimulationEngine()
-                .nextTurn(simulation);
+            new DefaultSimulationEngine(
+                productionCalculator,
+                expansionService
+            )
+            .nextTurn(simulation);
 
         Simulation turn2 =
-            new DefaultSimulationEngine()
-                .nextTurn(turn1);
+            new DefaultSimulationEngine(
+                productionCalculator,
+                expansionService
+            )
+            .nextTurn(turn1);
 
         assertThat(turn2.getTurn())
             .isEqualTo(2);
@@ -207,5 +248,53 @@ class DefaultSimulationEngineTest {
                 stock1.get(ResourceType.WOOD)
             );
         }
+    }
+
+    @Test
+    void shouldExpandAtLeastOneTerritoryAcrossTurns() {
+        World world =
+                new ContinentWorldGenerator(
+                        new Random(42)
+                ).generate(80, 48);
+
+        Simulation simulation =
+                new DefaultSimulationFactory()
+                        .create(world);
+
+        int initialClaimedTiles =
+                simulation.getTerritories()
+                        .stream()
+                        .mapToInt(territory ->
+                                territory
+                                        .getPositions()
+                                        .size()
+                        )
+                        .sum();
+
+        SimulationEngine simulationEngine =
+            new DefaultSimulationEngine(
+                new DefaultTerritoryProductionCalculator(),
+                new DefaultTerritoryExpansionService()
+            );
+
+        Simulation next =
+            simulationEngine.nextTurn(
+                simulation
+            );
+
+        int claimedTilesAfterTurn =
+                next.getTerritories()
+                        .stream()
+                        .mapToInt(territory ->
+                                territory
+                                        .getPositions()
+                                        .size()
+                        )
+                        .sum();
+
+        assertThat(claimedTilesAfterTurn)
+                .isGreaterThanOrEqualTo(
+                        initialClaimedTiles
+                );
     }
 }

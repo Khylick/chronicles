@@ -1,6 +1,7 @@
 import type {
     Population,
     ResourceType,
+    Territory,
     World
 } from "../../world/types/world";
 
@@ -18,4 +19,5 @@ export interface Simulation {
     turn: number;
     world: World;
     civilizationStates: CivilizationState[];
+    territories: Territory[];
 }
